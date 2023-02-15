@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Railgun - Share your media",
+  "short_name": "Railgun",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "Railgun is a website where you can share your video, audio or send posts."
+}

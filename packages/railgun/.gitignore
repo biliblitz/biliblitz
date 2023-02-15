@@ -1,0 +1,8 @@
+# Build
+dist
+lib
+lib-types
+server
+
+# Private information
+/.env

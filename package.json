@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "fmt": "yarn workspace @railgun/heroicons run fmt && yarn workspace @railgun/ui run fmt && yarn workspace railgun run fmt"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
