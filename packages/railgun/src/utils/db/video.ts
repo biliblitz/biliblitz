@@ -1,13 +1,13 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { db } from "../db";
 
-export interface Episode {
+export type Episode = {
   name: string;
   uploadAt: Date;
   unlockAt: Date;
-}
+};
 
-export interface Video {
+export type Video = {
   title: string;
   plays: number;
   description: string;
@@ -15,12 +15,12 @@ export interface Video {
   unlockAt: Date;
   episodes: Episode[];
   uploader: ObjectId;
-}
+};
 
-const videoDocs = db.collection<Video>("video");
+const collVideo = db.collection<Video>("video");
 
 export function createVideo(uploader: ObjectId, title: string) {
-  return videoDocs.insertOne({
+  return collVideo.insertOne({
     title,
     plays: 0,
     description: "-- No Descripition --",
@@ -32,7 +32,7 @@ export function createVideo(uploader: ObjectId, title: string) {
 }
 
 export function createEpisode(videoId: ObjectId, name: string) {
-  return videoDocs.updateOne(
+  return collVideo.updateOne(
     { _id: videoId },
     {
       $addToSet: {
@@ -47,8 +47,8 @@ export function createEpisode(videoId: ObjectId, name: string) {
 }
 
 export function getVideoRandom() {
-  return videoDocs
-    .aggregate([
+  return collVideo
+    .aggregate<WithId<Video>>([
       { $match: { unlockAt: { $lte: new Date() } } },
       { $sample: { size: 20 } },
     ])
@@ -56,9 +56,9 @@ export function getVideoRandom() {
 }
 
 export function getVideoById(videoId: ObjectId) {
-  return videoDocs.findOne({ _id: videoId, unlockAt: { $lte: new Date() } });
+  return collVideo.findOne({ _id: videoId, unlockAt: { $lte: new Date() } });
 }
 
 export function getVideoByUser(uploader: ObjectId) {
-  return videoDocs.find({ uploader }).toArray();
+  return collVideo.find({ uploader }).toArray();
 }

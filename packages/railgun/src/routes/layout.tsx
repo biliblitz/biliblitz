@@ -1,5 +1,4 @@
 import { component$, Slot } from "@builder.io/qwik";
-import { loader$ } from "@builder.io/qwik-city";
 import { Footer } from "~/components/footer/footer";
 import { Side } from "~/components/side/side";
 

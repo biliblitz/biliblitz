@@ -7,12 +7,11 @@ import { getVideoById } from "~/utils/db/video";
 
 export const video$ = loader$(async (event) => {
   const id = event.params.video;
-  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+  if (!ObjectId.isValid(id)) {
     throw event.error(404, "Unexpected param");
   }
 
-  const videoId = new ObjectId(event.params.video);
-  const video = await getVideoById(videoId);
+  const video = await getVideoById(new ObjectId(event.params.video));
 
   if (!video) {
     throw event.error(404, "Video not Found");
