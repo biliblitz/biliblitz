@@ -1,5 +1,6 @@
+import type { Cookie } from "@builder.io/qwik-city";
 import { randomUUID } from "crypto";
-import { ObjectId } from "mongodb";
+import type { ObjectId } from "mongodb";
 import { db } from "../db";
 import { getUserById } from "./user";
 
@@ -33,7 +34,8 @@ export async function issueSession(user: ObjectId) {
   return uuid;
 }
 
-export async function checkSession(session?: string | null) {
+export async function checkSession(cookie: Cookie) {
+  const session = cookie.get("session")?.value;
   if (!session) return null;
   const sess = await collSession.findOne({ session });
   return sess && (await getUserById(sess.user));

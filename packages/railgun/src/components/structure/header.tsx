@@ -2,7 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 import { IconMagnifyingGlass } from "@railgun/heroicons";
 
-export default component$(() => {
+export const Header = component$(() => {
   return (
     <header class="sticky top-0 flex justify-between py-4 px-8 backdrop-blur">
       <div class="relative flex items-center">

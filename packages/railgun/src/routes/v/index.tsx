@@ -1,12 +1,13 @@
 import { component$ } from "@builder.io/qwik";
 import { Link, loader$ } from "@builder.io/qwik-city";
 import { IconPlayCircle, IconUser } from "@railgun/heroicons";
-import { getVideoRandom } from "~/utils/db/video";
-import { serializeId } from "~/utils/serialize";
+import { Heading } from "~/components/heading/heading";
+import { getPublicVideoRandom } from "~/utils/db/video";
+import { serializeObject } from "~/utils/serialize";
 
 export const videos$ = loader$(async () => {
-  const videos = await getVideoRandom();
-  return serializeId(videos);
+  const videos = await getPublicVideoRandom();
+  return videos.map(serializeObject);
 });
 
 export default component$(() => {
@@ -14,7 +15,7 @@ export default component$(() => {
 
   return (
     <article>
-      <h2 class="text-2xl font-bold">Recommendations</h2>
+      <Heading>Recommendations</Heading>
       <div class="my-8 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {videos.value?.map((video) => (
           <div class="space-y-2" key={video._id}>

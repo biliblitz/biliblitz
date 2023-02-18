@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import type { ObjectId, UpdateFilter, WithId } from "mongodb";
 import { db } from "../db";
 
 export type Episode = {
@@ -46,7 +46,7 @@ export function createEpisode(videoId: ObjectId, name: string) {
   );
 }
 
-export function getVideoRandom() {
+export function getPublicVideoRandom() {
   return collVideo
     .aggregate<WithId<Video>>([
       { $match: { unlockAt: { $lte: new Date() } } },
@@ -55,10 +55,23 @@ export function getVideoRandom() {
     .toArray();
 }
 
-export function getVideoById(videoId: ObjectId) {
+export function getPublicVideoById(videoId: ObjectId) {
   return collVideo.findOne({ _id: videoId, unlockAt: { $lte: new Date() } });
+}
+
+export function getVideoByIdAndUser(videoId: ObjectId, uploader: ObjectId) {
+  return collVideo.findOne({ _id: videoId, uploader });
 }
 
 export function getVideoByUser(uploader: ObjectId) {
   return collVideo.find({ uploader }).toArray();
+}
+
+export function updateVideoProfile(
+  videoId: ObjectId,
+  update: UpdateFilter<Video>
+) {
+  return collVideo.findOneAndUpdate({ _id: videoId }, update, {
+    returnDocument: "after",
+  });
 }

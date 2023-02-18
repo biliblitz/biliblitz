@@ -1,5 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik";
-import { Link, LinkProps, useLocation } from "@builder.io/qwik-city";
+import type { LinkProps} from "@builder.io/qwik-city";
+import { Link, useLocation } from "@builder.io/qwik-city";
 
 type Props = Omit<LinkProps, "class"> & { class?: string };
 

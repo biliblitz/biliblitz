@@ -3,7 +3,7 @@ import { Link } from "@builder.io/qwik-city";
 import { IconComputerDesktop, IconVideoCamera } from "@railgun/heroicons";
 import { NavLink } from "~/components/nav-link/nav-link";
 
-export const Side = component$(() => {
+export const Aside = component$(() => {
   return (
     <aside class="sticky top-0 h-screen w-64 shrink-0 self-start overflow-y-auto border-r border-slate-300 dark:border-slate-700">
       <h2 class="px-8 py-6 text-2xl font-bold">

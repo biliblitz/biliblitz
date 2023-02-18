@@ -6,3 +6,6 @@ server
 
 # Private information
 /.env
+
+# Test
+public/*.mp4

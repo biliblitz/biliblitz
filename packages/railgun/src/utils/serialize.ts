@@ -1,33 +1,13 @@
 import { ObjectId } from "mongodb";
 
-type SerializeId<T> = T extends ObjectId
-  ? string
-  : T extends Date
-  ? Date
-  : T extends {}
-  ? { [K in keyof T]: SerializeId<T[K]> }
-  : T;
+type Serialize<T> = { [K in keyof T]: T[K] extends ObjectId ? string : T[K] };
 
-export function serializeId<T>(object: T): SerializeId<T> {
-  if (object instanceof ObjectId) {
-    return object.toHexString() as SerializeId<T>;
-  }
-  if (Array.isArray(object)) {
-    return object.map(serializeId) as SerializeId<T>;
-  }
-  if (typeof object === "object") {
-    if (object instanceof Date) {
-      return object as SerializeId<T>;
-    }
-    if (!object) {
-      return object as SerializeId<T>;
-    }
-    return Object.fromEntries(
-      Object.entries(object as any).map(([key, value]) => [
-        key,
-        serializeId(value),
-      ])
-    ) as SerializeId<T>;
-  }
-  return object as SerializeId<T>;
+export function serializeObject<T>(obj: T): Serialize<T> {
+  if (!obj) throw new Error("Serialize null");
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [
+      key,
+      value instanceof ObjectId ? value.toHexString() : value,
+    ])
+  ) as Serialize<T>;
 }
