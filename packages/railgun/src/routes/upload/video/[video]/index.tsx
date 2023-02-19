@@ -8,6 +8,7 @@ import { SubHeading } from "~/components/heading/sub-heading";
 import { Modal } from "~/components/modal/modal";
 import { toDatetimeLocal } from "~/utils/date";
 import { checkSession } from "~/utils/db/session";
+import { File } from "undici";
 import {
   createEpisode,
   getVideoByIdAndUser,
@@ -15,6 +16,10 @@ import {
 } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 import { zDatetimeLocal, zTimezone } from "~/utils/zod";
+import { Blob } from "buffer";
+import { randomUUID } from "crypto";
+import { rm, unlink, writeFile } from "fs/promises";
+import { ffprobe } from "~/utils/ffmpeg";
 
 export const video$ = loader$(async ({ params, cookie, error }) => {
   const id = new ObjectId(params.video);
@@ -51,19 +56,58 @@ export const editVideoProfile$ = action$(
   })
 );
 
+export const uploadVideo$ = action$(async (data, { error }) => {
+  if (!(data.file instanceof Blob)) {
+    throw error(402, "Unexpected File");
+  }
+  const file = data.file as File;
+
+  let filename = `public/${randomUUID()}`;
+  switch (file.type) {
+    case "video/mp4":
+      filename += ".mp4";
+      break;
+    case "video/x-flv":
+      filename += ".flv";
+      break;
+    case "video/x-matroska":
+      filename += ".mkv";
+      break;
+    case "video/webm":
+      filename += ".webm";
+      break;
+    default:
+      throw error(
+        402,
+        "Unsupported Video Encoding: only flv/mp4/mkv/webm supported"
+      );
+  }
+
+  await writeFile(filename, Buffer.from(await file.arrayBuffer()));
+  console.log("fuck you");
+  const probe = await ffprobe(filename);
+  console.log("fuck you");
+  console.log(probe);
+  console.log("fuck you");
+  await rm(filename);
+  return probe;
+}, zod$({ file: z.any() }));
+
 export const createEpisode$ = action$(async (data, { params, error }) => {
   const video = new ObjectId(params.video);
-  const episode = await createEpisode(video, data.name);
-  if (!episode.acknowledged) {
-    throw error(500, "Database Error");
-  }
-  return { success: true };
-}, zod$({ name: z.string().min(1) }));
+
+  // const episode = await createEpisode(video, data.name);
+  // if (!episode.acknowledged) {
+  //   throw error(500, "Database Error");
+  // }
+  // return { success: true };
+}, zod$({ name: z.string().min(1), file: z.any() }));
 
 export default component$(() => {
   const video = video$.use();
   const editVideoProfile = editVideoProfile$.use();
   const createEpisode = createEpisode$.use();
+  const uploadVideo = uploadVideo$.use();
 
   // use server timezone here
   const times = useSignal(() => ({
@@ -134,17 +178,13 @@ export default component$(() => {
         <span>Create new episode</span>
       </label>
       <Modal id="new-episode">
-        <SubHeading>Create new episode</SubHeading>
-        <Form action={createEpisode} class="mt-4" spaReset>
-          <input
-            type="text"
-            name="name"
-            class="input"
-            placeholder="Name..."
-            required
-          />
-          <div class="mt-4 flex justify-end">
-            <button class="btn">确认</button>
+        <SubHeading>Upload a video</SubHeading>
+        <Form action={uploadVideo} class="mt-4 space-y-4" spaReset>
+          <FormItem field="Video">
+            <input type="file" name="file" class="input" accept="video/*" />
+          </FormItem>
+          <div class="ml-32">
+            <button class="btn">Upload</button>
           </div>
         </Form>
       </Modal>

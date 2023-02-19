@@ -1,10 +1,17 @@
 import type { ObjectId, UpdateFilter, WithId } from "mongodb";
 import { db } from "../db";
 
+export type SourceFile = {
+  filename: string;
+  mimetype: string;
+  filesize: number;
+};
+
 export type Episode = {
   name: string;
   uploadAt: Date;
   unlockAt: Date;
+  files: SourceFile[];
 };
 
 export type Video = {
@@ -40,6 +47,7 @@ export function createEpisode(videoId: ObjectId, name: string) {
           name,
           uploadAt: new Date(),
           unlockAt: new Date(),
+          files: [],
         },
       },
     }

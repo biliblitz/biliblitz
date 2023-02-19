@@ -14,25 +14,25 @@
 .popover-right,
 .popover-right-top,
 .popover-right-bottom {
-  @apply left-full;
+  @apply left-full -translate-x-2;
 }
 
 .popover-left,
 .popover-left-top,
 .popover-left-bottom {
-  @apply right-full;
+  @apply right-full translate-x-2;
 }
 
 .popover-top,
 .popover-top-left,
 .popover-top-right {
-  @apply bottom-full;
+  @apply bottom-full translate-y-2;
 }
 
 .popover-bottom,
 .popover-bottom-left,
 .popover-bottom-right {
-  @apply top-full;
+  @apply top-full -translate-y-2;
 }
 
 .popover-right-top,
@@ -77,28 +77,24 @@
   &.popover-right,
   &.popover-right-top,
   &.popover-right-bottom {
-    @apply translate-x-2;
+    @apply translate-x-0;
   }
 
   &.popover-left,
   &.popover-left-top,
   &.popover-left-bottom {
-    @apply -translate-x-2;
+    @apply translate-x-0;
   }
 
   &.popover-top,
   &.popover-top-left,
   &.popover-top-right {
-    @apply -translate-y-2;
+    @apply translate-y-0;
   }
 
   &.popover-bottom,
   &.popover-bottom-left,
   &.popover-bottom-right {
-    @apply translate-y-2;
-  }
-
-  &.menu-submenu {
-    @apply translate-x-0;
+    @apply translate-y-0;
   }
 }
