@@ -13,9 +13,7 @@ import { getVideoByIdAndUser, updateVideoProfile } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 import { zDatetimeLocal, zTimezone } from "~/utils/zod";
 import { Blob } from "buffer";
-import { randomUUID } from "crypto";
-import { rm, writeFile } from "fs/promises";
-import { ffprobe } from "~/utils/ffmpeg";
+import { processVideo } from "~/utils/ffmpeg";
 
 export const video$ = loader$(async ({ params, cookie, error }) => {
   const id = new ObjectId(params.video);
@@ -52,41 +50,24 @@ export const editVideoProfile$ = action$(
   })
 );
 
-export const uploadVideo$ = action$(async (data, { error }) => {
+export const uploadVideo$ = action$(async (data, { error, fail }) => {
   if (!(data.file instanceof Blob)) {
     throw error(402, "Unexpected File");
   }
-  const file = data.file as File;
 
-  let filename = `public/${randomUUID()}`;
-  switch (file.type) {
-    case "video/mp4":
-      filename += ".mp4";
-      break;
-    case "video/x-flv":
-      filename += ".flv";
-      break;
-    case "video/x-matroska":
-      filename += ".mkv";
-      break;
-    case "video/webm":
-      filename += ".webm";
-      break;
-    default:
-      throw error(
-        402,
-        "Unsupported Video Encoding: only flv/mp4/mkv/webm supported"
-      );
+  try {
+    const result = await processVideo(data.file as File);
+    for (const warn of result.warnings) {
+      console.warn(warn);
+    }
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      return fail(402, { reason: `Error while process video: ${e.message}` });
+    } else {
+      throw e;
+    }
   }
-
-  await writeFile(filename, Buffer.from(await file.arrayBuffer()));
-  console.log("fuck you");
-  const probe = await ffprobe(filename);
-  console.log("fuck you");
-  console.log(probe);
-  console.log("fuck you");
-  await rm(filename);
-  return probe;
 }, zod$({ file: z.any() }));
 
 export const createEpisode$ = action$(async (_, { params }) => {
@@ -117,10 +98,33 @@ export default component$(() => {
     times.value.createAt = toDatetimeLocal(video.value.createAt);
   });
 
+  const createEpisodeModal = useSignal<HTMLInputElement>();
+  const successModal = useSignal<HTMLInputElement>();
+  const errorModal = useSignal<HTMLInputElement>();
+  useClientEffect$(({ track }) => {
+    const probe = track(() => uploadVideo.value);
+
+    if (probe) {
+      if (createEpisodeModal.value) {
+        createEpisodeModal.value.checked = false;
+      }
+      if (!probe.failed) {
+        // success
+        if (successModal.value) {
+          successModal.value.checked = true;
+        }
+      } else {
+        // failed
+        if (errorModal.value) {
+          errorModal.value.checked = true;
+        }
+      }
+    }
+  });
+
   return (
     <div class="space-y-4">
       <Heading>Video - {video.value.title}</Heading>
-
       <SubHeading>Profiles</SubHeading>
       <Form action={editVideoProfile} class="space-y-2">
         <FormItem field="Title">
@@ -156,8 +160,7 @@ export default component$(() => {
           Update
         </button>
       </Form>
-
-      <SubHeading>Episodes</SubHeading>
+      <SubHeading>Episodes</SubHeading>44:49 / 54:36
       <ul class="mt-4 space-y-4">
         {video.value.episodes.map((episode, index) => (
           <li key={index}>
@@ -165,25 +168,69 @@ export default component$(() => {
           </li>
         ))}
       </ul>
-      <label
-        for="new-episode"
-        class="grid cursor-pointer place-items-center rounded-md border border-dashed border-slate-300 p-4 opacity-60 transition hover:opacity-100 dark:border-slate-700"
-      >
-        <IconPlus class="h-16 w-16" />
-        <span>Create new episode</span>
-      </label>
-      <Modal id="new-episode">
-        <SubHeading>Upload a video</SubHeading>
-        <Form action={uploadVideo} class="mt-4 space-y-4" spaReset>
-          <FormItem field="Video">
-            <input type="file" name="file" class="input" accept="video/*" />
-          </FormItem>
-          <div class="ml-32">
-            <button class="btn">Upload</button>
-          </div>
-        </Form>
-      </Modal>
+      <div>
+        <label
+          for="new-episode"
+          class="grid cursor-pointer place-items-center rounded-md border border-dashed border-slate-300 p-4 opacity-60 transition hover:opacity-100 dark:border-slate-700"
+        >
+          <IconPlus class="h-16 w-16" />
+          <span>Create new episode</span>
+        </label>
+        <Modal id="new-episode" ref={createEpisodeModal}>
+          <SubHeading>Upload a video</SubHeading>
+          <Form action={uploadVideo} class="mt-4 space-y-4" spaReset>
+            <FormItem field="Title">
+              <input type="text" name="name" class="input" required />
+            </FormItem>
+            <FormItem field="Video">
+              <input
+                type="file"
+                name="file"
+                class="input"
+                required
+                accept="video/*"
+              />
+            </FormItem>
+            <div class="ml-32">
+              <button class="btn" disabled={uploadVideo.isRunning}>
+                Upload
+              </button>
+            </div>
+          </Form>
+        </Modal>
 
+        <Modal id="create-success" ref={successModal}>
+          <SubHeading>Success</SubHeading>
+          <p class="my-4">Your video has been uploaded successfully.</p>
+          <p class="my-4 text-slate-500">
+            {uploadVideo.value?.warnings?.map((warn, index) => (
+              <span key={index}>
+                {warn}
+                <br />
+              </span>
+            ))}
+          </p>
+          <p class="my-4">Hope everything works for you.</p>
+          <div class="flex justify-end">
+            <label for="create-success" class="btn-subtle btn" tabIndex={0}>
+              Close
+            </label>
+          </div>
+        </Modal>
+
+        <Modal id="create-error" ref={errorModal}>
+          <SubHeading>Fail</SubHeading>
+          <p class="my-4 text-red-500">
+            Your video failed to upload successfully.
+          </p>
+          <p class="my-4 text-red-500">{uploadVideo.value?.reason}</p>
+          <div class="flex justify-end">
+            <label for="create-error" class="btn-subtle btn" tabIndex={0}>
+              Close
+            </label>
+          </div>
+        </Modal>
+      </div>
       {JSON.stringify(video.value)}
     </div>
   );
