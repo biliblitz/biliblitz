@@ -8,17 +8,13 @@ import { SubHeading } from "~/components/heading/sub-heading";
 import { Modal } from "~/components/modal/modal";
 import { toDatetimeLocal } from "~/utils/date";
 import { checkSession } from "~/utils/db/session";
-import { File } from "undici";
-import {
-  createEpisode,
-  getVideoByIdAndUser,
-  updateVideoProfile,
-} from "~/utils/db/video";
+import type { File } from "undici";
+import { getVideoByIdAndUser, updateVideoProfile } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 import { zDatetimeLocal, zTimezone } from "~/utils/zod";
 import { Blob } from "buffer";
 import { randomUUID } from "crypto";
-import { rm, unlink, writeFile } from "fs/promises";
+import { rm, writeFile } from "fs/promises";
 import { ffprobe } from "~/utils/ffmpeg";
 
 export const video$ = loader$(async ({ params, cookie, error }) => {
@@ -93,9 +89,8 @@ export const uploadVideo$ = action$(async (data, { error }) => {
   return probe;
 }, zod$({ file: z.any() }));
 
-export const createEpisode$ = action$(async (data, { params, error }) => {
-  const video = new ObjectId(params.video);
-
+export const createEpisode$ = action$(async (_, { params }) => {
+  // const video = new ObjectId(params.video);
   // const episode = await createEpisode(video, data.name);
   // if (!episode.acknowledged) {
   //   throw error(500, "Database Error");
@@ -106,7 +101,7 @@ export const createEpisode$ = action$(async (data, { params, error }) => {
 export default component$(() => {
   const video = video$.use();
   const editVideoProfile = editVideoProfile$.use();
-  const createEpisode = createEpisode$.use();
+  // const createEpisode = createEpisode$.use();
   const uploadVideo = uploadVideo$.use();
 
   // use server timezone here

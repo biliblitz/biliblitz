@@ -25,6 +25,7 @@
   "dependencies": {
     "@railgun/heroicons": "^0.0.1",
     "@railgun/ionicons": "^0.0.1",
+    "@railgun/libass-wasm": "^0.0.1",
     "@railgun/ui": "^0.0.1",
     "mongodb": "^5.0.1"
   },

@@ -2,20 +2,16 @@
   @apply w-full bg-slate-100 dark:bg-slate-800;
 }
 
-.video {
-  @apply relative w-full bg-white dark:bg-black [:fullscreen_&]:h-full [:fullscreen_&]:bg-black;
-}
-
-.play {
-  @apply pointer-events-none absolute top-1/2 left-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-slate-300 opacity-60 transition dark:bg-slate-800;
-}
-
-.playing .play {
-  @apply scale-125 opacity-0;
+.inactive:fullscreen {
+  @apply cursor-none;
 }
 
 .controls {
-  @apply flex w-full items-center justify-between p-2;
+  @apply flex w-full items-center justify-between p-2 transition duration-300;
+}
+
+.inactive:fullscreen .controls {
+  @apply opacity-0;
 }
 
 .controls-left,

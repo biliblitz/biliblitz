@@ -23,47 +23,37 @@ import {
 import { IconCircle } from "../icon/icon-circle";
 
 import playerStyle from "./player.css?inline";
+import { Video } from "./video";
 
 type VideoSource = {
   mimetype: string;
   source: string;
 };
 
-type AudioSource = {
-  mimetype: string;
-  source: string;
-};
-
 type SubtitleSource = {
-  mimetype: string;
+  type: "ass" | "srt" | "vtt";
   source: string;
-};
-
-type FontSource = {
-  mimetype: string;
-  source: string;
+  fonts: string[];
 };
 
 type Props = {
   video?: VideoSource[];
-  audio?: AudioSource[];
   subtitles?: SubtitleSource[];
-  fonts?: FontSource[];
 };
 
 export const Player = component$((props: Props) => {
   useStyles$(playerStyle);
 
   const video = props.video ?? [];
-  const audio = props.audio ?? [];
   const subtitles = props.subtitles ?? [];
-  const fonts = props.fonts ?? [];
 
   const videoRef = useSignal<HTMLVideoElement>();
   const playerRef = useSignal<HTMLDivElement>();
+
   const playing = useSignal(false);
   const muted = useSignal(false);
   const volume = useSignal(1);
+  const playbackRate = useSignal(1);
 
   useClientEffect$(({ track }) => {
     const video = track(() => videoRef.value);
@@ -82,6 +72,19 @@ export const Player = component$((props: Props) => {
           playing.value = false;
         }
       });
+      video.addEventListener("ratechange", () => {
+        if (playbackRate.value !== video.playbackRate) {
+          playbackRate.value = video.playbackRate;
+        }
+      });
+      video.addEventListener("volumechange", () => {
+        if (volume.value !== video.volume) {
+          volume.value = video.volume;
+        }
+        if (muted.value !== video.muted) {
+          muted.value = video.muted;
+        }
+      });
     }
   });
 
@@ -91,6 +94,7 @@ export const Player = component$((props: Props) => {
     const newMute = track(() => muted.value);
     const newVolume = track(() => volume.value);
     const newPlaying = track(() => playing.value);
+    const newPlaybackRate = track(() => playbackRate.value);
 
     if (video) {
       video.muted = newMute;
@@ -100,22 +104,12 @@ export const Player = component$((props: Props) => {
       } else {
         video.pause();
       }
+      video.playbackRate = newPlaybackRate;
     }
   });
 
-  const inactive = useSignal(false);
-  useClientEffect$(({ track }) => {
-    const player = track(() => playerRef.value);
-    if (player) {
-    }
-  });
-
-  const togglePlay = $(() => {
-    playing.value = !playing.value;
-  });
-  const toggleMute = $(() => {
-    muted.value = !muted.value;
-  });
+  const togglePlay = $(() => (playing.value = !playing.value));
+  const toggleMute = $(() => (muted.value = !muted.value));
   const toggleFullscreen = $(() => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
@@ -124,34 +118,39 @@ export const Player = component$((props: Props) => {
     }
   });
 
-  const playbackRate = useSignal(1);
-  useClientEffect$(({ track }) => {
-    const rate = track(() => playbackRate.value);
-    const video = track(() => videoRef.value);
-    if (video) {
-      video.playbackRate = rate;
-    }
-  });
-
   const trackingMouse = useSignal(false);
 
+  const mouseMoves = useSignal(0);
+  const insideControls = useSignal(false);
+
   return (
-    <div class={["player", { playing: playing.value }]} ref={playerRef}>
-      <div class="video">
-        <video
-          class="h-full w-full object-contain"
-          ref={videoRef}
-          onClick$={togglePlay}
-        >
-          {video.map(({ mimetype, source }, index) => (
-            <source src={source} type={mimetype} key={index} />
-          ))}
-        </video>
-        <div class="play">
-          <IconPlay class="h-8 w-8" />
-        </div>
-      </div>
-      <div class="controls">
+    <div
+      class={[
+        "player",
+        {
+          playing: playing.value,
+          inactive: mouseMoves.value === 0 && !insideControls.value,
+        },
+      ]}
+      ref={playerRef}
+      onMouseMove$={() => {
+        mouseMoves.value++;
+        setTimeout(() => {
+          mouseMoves.value--;
+        }, 2000);
+      }}
+    >
+      <Video
+        video={video}
+        subtitle={subtitles.at(0) ?? null}
+        ref={videoRef}
+        onClick$={togglePlay}
+      />
+      <div
+        class="controls"
+        onMouseEnter$={() => (insideControls.value = true)}
+        onMouseLeave$={() => (insideControls.value = false)}
+      >
         <div class="controls-left">
           <span onClick$={togglePlay} class="icon-wrapper">
             {playing.value ? (
@@ -174,7 +173,7 @@ export const Player = component$((props: Props) => {
             )}
           </span>
           <span
-            class="-mx-1 flex h-4 cursor-pointer items-center px-2"
+            class="-mx-1 flex h-4 cursor-pointer items-center px-2 [:fullscreen_&]:px-3"
             onMouseDown$={(e, t) => {
               trackingMouse.value = true;
               const bounding = t.getBoundingClientRect();
@@ -183,9 +182,8 @@ export const Player = component$((props: Props) => {
               volume.value = fixed;
               muted.value = false;
             }}
-            onMouseLeave$={() => (trackingMouse.value = false)}
-            onMouseUp$={() => (trackingMouse.value = false)}
-            onMouseMove$={(e, t) => {
+            window:onMouseUp$={() => (trackingMouse.value = false)}
+            window:onMouseMove$={(e, t) => {
               if (trackingMouse.value) {
                 const bounding = t.getBoundingClientRect();
                 const percent = (e.clientX - bounding.x) / bounding.width;
@@ -213,6 +211,7 @@ export const Player = component$((props: Props) => {
                     <li
                       class="menu-item"
                       onClick$={() => (playbackRate.value = rate)}
+                      key={rate}
                     >
                       {playbackRate.value === rate && (
                         <IconCircle class="menu-icon" />

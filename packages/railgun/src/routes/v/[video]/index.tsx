@@ -33,7 +33,24 @@ export default component$(() => {
     <div class="flex gap-8">
       <main class="flex-1">
         {active ? (
-          <Player video={[{ mimetype: "video/mp4", source: "/ending.mp4" }]} />
+          <Player
+            video={[{ mimetype: "video/mp4", source: "/test/onimai.mp4" }]}
+            subtitles={[
+              {
+                type: "ass",
+                source: "/test/chinese.ass",
+                fonts: [
+                  "/test/1.ttf",
+                  "/test/2.otf",
+                  "/test/3.otf",
+                  "/test/4.otf",
+                  "/test/5.otf",
+                  "/test/6.ttf",
+                  "/test/7.ttf",
+                ],
+              },
+            ]}
+          />
         ) : (
           <div class="grid aspect-video w-full place-items-center space-y-4 bg-slate-300 text-center dark:bg-slate-700">
             <div>
@@ -47,20 +64,18 @@ export default component$(() => {
       <aside class="w-64 shrink-0">
         <nav class="nav px-0">
           <h3 class="nav-title">Episodes</h3>
-          <div class="max-h-96 w-full">
-            {video.value?.episodes.map((episode, index) => (
-              <Link
-                class={["nav-item", { active: episode === active }]}
-                key={index}
-                title={episode.name}
-                href={`?p=${index}`}
-              >
-                <span class="overflow-hidden text-ellipsis">
-                  #{index + 1} {episode.name}
-                </span>
-              </Link>
-            ))}
-          </div>
+          {video.value?.episodes.map((episode, index) => (
+            <Link
+              class={["nav-item", { active: episode === active }]}
+              key={index}
+              title={episode.name}
+              href={`?p=${index}`}
+            >
+              <span class="overflow-hidden text-ellipsis">
+                #{index + 1} {episode.name}
+              </span>
+            </Link>
+          ))}
         </nav>
       </aside>
     </div>

@@ -8,4 +8,4 @@ server
 /.env
 
 # Test
-public/*.mp4
+public/test

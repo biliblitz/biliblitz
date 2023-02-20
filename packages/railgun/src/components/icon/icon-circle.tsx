@@ -1,4 +1,5 @@
-import { component$, QwikIntrinsicElements } from "@builder.io/qwik";
+import type { QwikIntrinsicElements } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 
 type Props = Pick<QwikIntrinsicElements["svg"], "class">;
 
