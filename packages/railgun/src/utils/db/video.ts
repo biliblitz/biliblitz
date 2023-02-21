@@ -1,17 +1,25 @@
 import type { ObjectId, UpdateFilter, WithId } from "mongodb";
 import { db } from "../db";
 
-export type SourceFile = {
-  filename: string;
+export type VideoSource = {
   mimetype: string;
-  filesize: number;
+  source: string;
+};
+
+export type SubtitleSource = {
+  type: "srt" | "webvtt" | "ass";
+  title: string;
+  language: string;
+  source: string;
+  fonts: string[];
 };
 
 export type Episode = {
   name: string;
   uploadAt: Date;
   unlockAt: Date;
-  files: SourceFile[];
+  source: VideoSource;
+  subtitles: SubtitleSource[];
 };
 
 export type Video = {
@@ -38,7 +46,12 @@ export function createVideo(uploader: ObjectId, title: string) {
   });
 }
 
-export function createEpisode(videoId: ObjectId, name: string) {
+export function createEpisode(
+  videoId: ObjectId,
+  name: string,
+  source: VideoSource,
+  subtitles: SubtitleSource[]
+) {
   return collVideo.updateOne(
     { _id: videoId },
     {
@@ -47,7 +60,8 @@ export function createEpisode(videoId: ObjectId, name: string) {
           name,
           uploadAt: new Date(),
           unlockAt: new Date(),
-          files: [],
+          source,
+          subtitles,
         },
       },
     }
@@ -57,14 +71,23 @@ export function createEpisode(videoId: ObjectId, name: string) {
 export function getPublicVideoRandom() {
   return collVideo
     .aggregate<WithId<Video>>([
-      { $match: { unlockAt: { $lte: new Date() } } },
+      {
+        $match: {
+          unlockAt: { $lte: new Date() },
+          episodes: { $not: { $size: 0 } },
+        },
+      },
       { $sample: { size: 20 } },
     ])
     .toArray();
 }
 
 export function getPublicVideoById(videoId: ObjectId) {
-  return collVideo.findOne({ _id: videoId, unlockAt: { $lte: new Date() } });
+  return collVideo.findOne({
+    _id: videoId,
+    unlockAt: { $lte: new Date() },
+    episodes: { $not: { $size: 0 } },
+  });
 }
 
 export function getVideoByIdAndUser(videoId: ObjectId, uploader: ObjectId) {

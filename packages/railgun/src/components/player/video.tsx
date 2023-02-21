@@ -4,21 +4,11 @@ import type { QwikIntrinsicElements, Signal } from "@builder.io/qwik";
 import { component$, useClientEffect$, useSignal } from "@builder.io/qwik";
 import { IconPlay } from "@railgun/heroicons";
 import SubtitlesOctopus from "@railgun/libass-wasm";
-
-type VideoSource = {
-  mimetype: string;
-  source: string;
-};
-
-type SubtitleSource = {
-  type: "ass" | "srt" | "vtt";
-  source: string;
-  fonts: string[];
-};
+import type { SubtitleSource, VideoSource } from "~/utils/db/video";
 
 type VideoProps = {
-  video: VideoSource[];
-  subtitle: SubtitleSource | null;
+  video: VideoSource;
+  subtitle: SubtitleSource | undefined;
   ref: Signal<HTMLVideoElement | undefined>;
 } & Omit<QwikIntrinsicElements["video"], "ref">;
 
@@ -31,17 +21,21 @@ export const Video = component$(
     useClientEffect$(({ track, cleanup }) => {
       const video = track(() => videoRef.value);
       const canvas = track(() => canvasRef.value);
-      const _subtitle = track(() => subtitle);
+      const ass = track(() => subtitle?.type === "ass" && subtitle);
 
-      if (video && canvas && _subtitle?.type === "ass") {
+      if (video && canvas && ass) {
+        console.log("libass-wasm: 🍑 is loading!!");
         const instance = new SubtitlesOctopus({
           video: video,
           canvas: canvas,
-          subUrl: _subtitle.source,
-          fonts: _subtitle.fonts,
+          subUrl: ass.source,
+          fonts: ass.fonts,
         });
 
-        cleanup(() => instance.dispose());
+        cleanup(() => {
+          console.log("libass-wasm: 🍑 is cleaning up!!");
+          instance.dispose();
+        });
       }
     });
 
@@ -55,17 +49,11 @@ export const Video = component$(
           }}
           {...props}
         >
-          {video.map((video) => (
-            <source
-              src={video.source}
-              type={video.mimetype}
-              key={video.source}
-            />
-          ))}
-          {subtitle?.type === "vtt" && (
+          <source src={video.source} type={video.mimetype} />
+          {(subtitle?.type === "webvtt" || subtitle?.type === "srt") && (
             <track
               src={subtitle.source}
-              srcLang="chinese"
+              srcLang={subtitle.language}
               kind="subtitles"
               default
             />

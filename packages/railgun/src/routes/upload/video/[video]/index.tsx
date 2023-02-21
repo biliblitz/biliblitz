@@ -9,7 +9,11 @@ import { Modal } from "~/components/modal/modal";
 import { toDatetimeLocal } from "~/utils/date";
 import { checkSession } from "~/utils/db/session";
 import type { File } from "undici";
-import { getVideoByIdAndUser, updateVideoProfile } from "~/utils/db/video";
+import {
+  createEpisode,
+  getVideoByIdAndUser,
+  updateVideoProfile,
+} from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 import { zDatetimeLocal, zTimezone } from "~/utils/zod";
 import { Blob } from "buffer";
@@ -50,17 +54,23 @@ export const editVideoProfile$ = action$(
   })
 );
 
-export const uploadVideo$ = action$(async (data, { error, fail }) => {
+export const uploadVideo$ = action$(async (data, { error, fail, params }) => {
   if (!(data.file instanceof Blob)) {
     throw error(402, "Unexpected File");
   }
+  const video = new ObjectId(params.video);
 
   try {
-    const result = await processVideo(data.file as File);
-    for (const warn of result.warnings) {
+    const { warnings, source, subtitles } = await processVideo(
+      data.file as File
+    );
+    for (const warn of warnings) {
       console.warn(warn);
     }
-    return result;
+
+    await createEpisode(video, data.name, source, subtitles);
+
+    return { warnings };
   } catch (e) {
     if (e instanceof Error) {
       return fail(402, { reason: `Error while process video: ${e.message}` });
@@ -68,21 +78,11 @@ export const uploadVideo$ = action$(async (data, { error, fail }) => {
       throw e;
     }
   }
-}, zod$({ file: z.any() }));
-
-export const createEpisode$ = action$(async (_, { params }) => {
-  // const video = new ObjectId(params.video);
-  // const episode = await createEpisode(video, data.name);
-  // if (!episode.acknowledged) {
-  //   throw error(500, "Database Error");
-  // }
-  // return { success: true };
-}, zod$({ name: z.string().min(1), file: z.any() }));
+}, zod$({ file: z.any(), name: z.string().min(1) }));
 
 export default component$(() => {
   const video = video$.use();
   const editVideoProfile = editVideoProfile$.use();
-  // const createEpisode = createEpisode$.use();
   const uploadVideo = uploadVideo$.use();
 
   // use server timezone here

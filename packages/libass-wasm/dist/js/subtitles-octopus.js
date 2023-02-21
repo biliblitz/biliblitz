@@ -1,4 +1,4 @@
-import worker from "./worker?worker&url";
+import worker from "./subtitles-octopus-worker?worker&url";
 
 export default function SubtitlesOctopus(options) {
   var self = this;
@@ -55,7 +55,6 @@ export default function SubtitlesOctopus(options) {
       self.worker = new Worker(worker, {
         type: "module",
       });
-      console.log(worker);
       self.worker.addEventListener("message", self.onWorkerMessage);
       self.worker.addEventListener("error", self.workerError);
     }
@@ -152,11 +151,11 @@ export default function SubtitlesOctopus(options) {
   }
 
   function onSeeking() {
-    self.video.removeEventListener("timeupdate", onTimeUpdate, false);
+    // self.video.removeEventListener("timeupdate", onTimeUpdate, false);
   }
 
   function onSeeked() {
-    self.video.addEventListener("timeupdate", onTimeUpdate, false);
+    // self.video.addEventListener("timeupdate", onTimeUpdate, false);
 
     var currentTime = self.video.currentTime + self.timeOffset;
 
@@ -495,14 +494,14 @@ export default function SubtitlesOctopus(options) {
       self.canvas.height = height;
 
       if (videoSize != null) {
-        self.canvasParent.style.position = "relative";
-        self.canvas.style.display = "block";
-        self.canvas.style.position = "absolute";
+        // self.canvasParent.style.position = "relative";
+        // self.canvas.style.display = "block";
+        // self.canvas.style.position = "absolute";
         self.canvas.style.width = videoSize.width + "px";
         self.canvas.style.height = videoSize.height + "px";
         self.canvas.style.top = top + "px";
         self.canvas.style.left = left + "px";
-        self.canvas.style.pointerEvents = "none";
+        // self.canvas.style.pointerEvents = "none";
       }
 
       self.worker.postMessage({
@@ -515,7 +514,7 @@ export default function SubtitlesOctopus(options) {
 
   self.resizeWithTimeout = function () {
     self.resize();
-    setTimeout(self.resize, 100);
+    // setTimeout(self.resize, 100);
   };
 
   self.runBenchmark = function () {
@@ -622,6 +621,7 @@ export default function SubtitlesOctopus(options) {
       window.removeEventListener("resize", self.resizeWithTimeout, false);
 
       // self.video.parentNode.removeChild(self.canvasParent);
+      self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
 
       self.video = null;
     }
@@ -738,4 +738,5 @@ export default function SubtitlesOctopus(options) {
   };
 
   self.init();
+  onSeeked();
 }

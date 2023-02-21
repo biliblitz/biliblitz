@@ -7,6 +7,7 @@ import path from "path";
 import { mkdir, rm, writeFile } from "fs/promises";
 import { promisify } from "util";
 import { mkdirSync } from "fs";
+import type { SubtitleSource, VideoSource } from "./db/video";
 
 const exec = promisify(_exec);
 
@@ -36,18 +37,11 @@ export type Ffprobe = {
   chapters: Chapter[];
 };
 
-export type Subtitle = {
-  title: string;
-  language: string;
-  source: string;
-  fonts: string[];
-};
-
 async function ffprobe(filename: string) {
   return new Promise<Ffprobe>((resolve, reject) => {
     _exec(
       `ffprobe -v quiet -print_format json -show_streams -show_chapters ${filename}`,
-      (err, stdout, _) => {
+      (err, stdout) => {
         if (err) {
           return reject(err);
         }
@@ -78,31 +72,39 @@ export async function processVideo(file: File) {
 
   try {
     let container = "";
+    let mimetype = "";
     switch (file.type) {
-      case "video/mp4":
+      case "video/x-matroska":
       case "video/x-flv":
-      case "video/x-matroska": {
+        /* eslint-disable no-fallthrough */
+        warnings.push("[warning] Convert file into MP4 format");
+      case "video/mp4": {
         container = "mp4";
+        mimetype = "video/mp4";
         break;
       }
       case "video/ogg": {
         container = "ogv";
+        mimetype = "video/ogg";
         break;
       }
       case "video/webm": {
         container = "webm";
+        mimetype = "video/webm";
         break;
       }
       default:
         throw new Error(
-          "Unsupported container: only flv/mp4/mkv/webm supported"
+          "Unsupported Video Format: only FLV/MP4/MKV/WebM supported"
         );
     }
 
     const probe = await ffprobe(tmpfile);
 
-    const ffmpegPreParams: string[] = [];
+    const dumpAttachmentParams: string[] = [];
     const ffmpegParams: string[] = [];
+    const videoParams: string[] = [];
+    const audioParams: string[] = [];
 
     // video
     const videos = probe.streams.filter(
@@ -136,8 +138,9 @@ export async function processVideo(file: File) {
       }
     }
 
-    const destfile = path.join(destdir, `video.${container}`);
-    ffmpegParams.push("-map", `0:${video.index}`, "-c:v", "copy");
+    const videoname = `video.${container}`;
+    const destfile = path.join(destdir, videoname);
+    videoParams.push(`-map 0:${video.index} -c:v copy`);
 
     // audio
     const audios = probe.streams.filter(
@@ -145,12 +148,12 @@ export async function processVideo(file: File) {
     );
     if (audios.length > 1) {
       throw new Error(
-        "Multiply audio tracks detected, please use single audio track."
+        "Multiply audio tracks detected, please leave single audio track."
       );
     }
     const audio = audios.at(0);
     if (!audio) {
-      warnings.push("No audio track detected.");
+      warnings.push("[warning] No audio track detected.");
     } else {
       switch (audio.codec_name) {
         case "aac":
@@ -164,9 +167,15 @@ export async function processVideo(file: File) {
           throw new Error(`Unknown audio codec: ${audio.codec_name}`);
         }
       }
-      ffmpegParams.push("-map", `0:${audio.index}`, "-c:a", "copy");
+      audioParams.push(`-map 0:${audio.index} -c:a copy`);
     }
 
+    // merge video and audio
+    ffmpegParams.push(
+      [...videoParams, ...audioParams, `"${destfile}"`].join(" ")
+    );
+
+    // fonts
     const attachments = probe.streams.filter(
       (value) => value.codec_type === "attachment"
     );
@@ -178,10 +187,10 @@ export async function processVideo(file: File) {
         attachment.codec_name === "woff" ||
         attachment.codec_name === "woff2"
       ) {
-        const source = `font${attachment.index}.${attachment.codec_name}`;
-        fonts.push(source);
+        const source = `font.${attachment.index}.${attachment.codec_name}`;
+        fonts.push(`/source/${uuid}/${source}`);
         const output = path.join(destdir, source);
-        ffmpegPreParams.push(
+        dumpAttachmentParams.push(
           `-dump_attachment:${attachment.index}`,
           `"${output}"`
         );
@@ -195,33 +204,58 @@ export async function processVideo(file: File) {
       }
     }
 
-    const subttls: Subtitle[] = [];
+    // subtitles
+    const subttls: SubtitleSource[] = [];
     const subtitles = probe.streams.filter(
       (value) => value.codec_type === "subtitle"
     );
     for (const subtitle of subtitles) {
+      switch (subtitle.codec_name) {
+        case "srt":
+        case "webvtt":
+        case "ass": {
+          break;
+        }
+        default: {
+          warnings.push(
+            `[warning] Unknown subtitle codec: ${subtitle.codec_name}`
+          );
+          continue;
+        }
+      }
       const title = subtitle.tags.title ?? `Subtitle #${subtitle.index}`;
       const language = subtitle.tags.language ?? "C";
-      const source = `${language}.${subtitle.index}.${subtitle.codec_name}`;
+      const ext = subtitle.codec_name.slice(-3);
+      const source = `${language}.${subtitle.index}.${ext}`;
       const output = path.join(destdir, source);
-      ffmpegPreParams.push(`-dump_attachment:${subtitle.index}`, `"${output}"`);
-      subttls.push({ title, language, source, fonts });
+      ffmpegParams.push(`-map 0:${subtitle.index} -c copy "${output}"`);
+      subttls.push({
+        title,
+        language,
+        source: `/source/${uuid}/${source}`,
+        fonts,
+        type: subtitle.codec_name,
+      });
       warnings.push(`Subtitle(${language}): ${title}`);
     }
 
     const command = [
       "ffmpeg -y",
-      ...ffmpegPreParams,
+      ...dumpAttachmentParams,
       `-i "${tmpfile}"`,
       ...ffmpegParams,
-      `"${destfile}"`,
     ].join(" ");
 
     console.log(`$ ${command}`);
-    // await exec(command);
+    await exec(command);
+
+    const source: VideoSource = {
+      mimetype: mimetype,
+      source: `/source/${uuid}/${videoname}`,
+    };
 
     return {
-      source: destfile,
+      source,
       subtitles: subttls,
       warnings,
     };

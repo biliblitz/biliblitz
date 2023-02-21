@@ -4,7 +4,7 @@ import { IconMagnifyingGlass } from "@railgun/heroicons";
 
 export const Header = component$(() => {
   return (
-    <header class="sticky top-0 flex justify-between py-4 px-8 backdrop-blur">
+    <header class="sticky top-0 z-[5] flex justify-between bg-white py-4 px-8 dark:bg-slate-900">
       <div class="relative flex items-center">
         <input class="input border-none pl-8" placeholder="Search ..." />
         <IconMagnifyingGlass class="absolute left-2 h-4 w-4" />
