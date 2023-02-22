@@ -1,4 +1,4 @@
-import type { QwikIntrinsicElements} from "@builder.io/qwik";
+import type { QwikIntrinsicElements } from "@builder.io/qwik";
 import { component$, Slot } from "@builder.io/qwik";
 import { IconXMark } from "@railgun/heroicons";
 

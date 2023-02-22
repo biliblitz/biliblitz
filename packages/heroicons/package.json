@@ -2,6 +2,7 @@
   "name": "@railgun/heroicons",
   "version": "0.0.1",
   "description": "Create a reusable Qwik component library",
+  "license": "MIT",
   "main": "./lib/index.qwik.mjs",
   "qwik": "./lib/index.qwik.mjs",
   "types": "./lib-types/index.d.ts",

@@ -179,7 +179,7 @@ export const Player = component$((props: Props) => {
           </span>
         </div>
         <div class="controls-right">
-          <span class="icon-wrapper popover-hover popover">
+          <span class="icon-wrapper popover popover-hover">
             <IconPlayForward class="icon" />
             <div class="popover-top-left popover-content cursor-default">
               <menu class="menu">

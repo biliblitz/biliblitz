@@ -33,6 +33,7 @@ export default component$(() => {
       <main class="flex-1">
         <Slot />
         <h1 class="my-4 text-2xl font-bold">{video.value.title}</h1>
+        <p class="text-sm">{video.value.description}</p>
       </main>
       <aside class="w-64 shrink-0">
         <nav class="nav px-0">

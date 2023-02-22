@@ -1,7 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "fmt": "yarn workspace @railgun/heroicons run fmt && yarn workspace @railgun/ui run fmt && yarn workspace railgun run fmt"
+    "fmt": "yarn workspace @railgun/heroicons run fmt && yarn workspace @railgun/ionicons run fmt && yarn workspace @railgun/ui run fmt && yarn workspace railgun run fmt",
+    "lint": "yarn workspace @railgun/heroicons run lint && yarn workspace @railgun/ionicons run lint && yarn workspace railgun run lint",
+    "build": "yarn workspace @railgun/heroicons run build && yarn workspace @railgun/ionicons run build && yarn workspace @railgun/ui run build && yarn workspace railgun run build"
   },
   "workspaces": [
     "packages/*"
