@@ -58,7 +58,7 @@ async function ffprobe(filename: string) {
 
 accessSync(MOUNT_POINT, constants.R_OK | constants.W_OK);
 
-const tmp = path.join(tmpdir(), "mikufans-upload");
+const tmp = path.join(tmpdir(), "moebuta-upload");
 mkdirSync(tmp, { recursive: true });
 
 export async function processVideo(file: File) {
@@ -205,39 +205,38 @@ export async function processVideo(file: File) {
     }
 
     // subtitles
-    const subttls: SubtitleSource[] = [];
-    const subtitles = probe.streams.filter(
-      (value) => value.codec_type === "subtitle"
-    );
-    for (const subtitle of subtitles) {
-      switch (subtitle.codec_name) {
-        case "srt":
-        case "webvtt":
-        case "ass": {
-          break;
+    const subtitles: SubtitleSource[] = [];
+    probe.streams
+      .filter((value) => value.codec_type === "subtitle")
+      .forEach((subtitle) => {
+        switch (subtitle.codec_name) {
+          case "srt":
+          case "webvtt":
+          case "ass": {
+            break;
+          }
+          default: {
+            warnings.push(
+              `[warning] Unknown subtitle codec: ${subtitle.codec_name}`
+            );
+            return;
+          }
         }
-        default: {
-          warnings.push(
-            `[warning] Unknown subtitle codec: ${subtitle.codec_name}`
-          );
-          continue;
-        }
-      }
-      const title = subtitle.tags.title ?? `Subtitle #${subtitle.index}`;
-      const language = subtitle.tags.language ?? "C";
-      const ext = subtitle.codec_name.slice(-3);
-      const source = `${language}.${subtitle.index}.${ext}`;
-      const output = path.join(destdir, source);
-      ffmpegParams.push(`-map 0:${subtitle.index} -c copy "${output}"`);
-      subttls.push({
-        title,
-        language,
-        source: `/source/${uuid}/${source}`,
-        fonts,
-        type: subtitle.codec_name,
+        const title = subtitle.tags.title ?? `Subtitle #${subtitle.index}`;
+        const language = subtitle.tags.language ?? "C";
+        const ext = subtitle.codec_name.slice(-3);
+        const source = `${language}.${subtitle.index}.${ext}`;
+        const output = path.join(destdir, source);
+        ffmpegParams.push(`-map 0:${subtitle.index} -c copy "${output}"`);
+        warnings.push(`Subtitle(${language}): ${title}`);
+        subtitles.push({
+          title,
+          language,
+          source: `/source/${uuid}/${source}`,
+          fonts,
+          type: subtitle.codec_name,
+        });
       });
-      warnings.push(`Subtitle(${language}): ${title}`);
-    }
 
     const command = [
       "ffmpeg -y",
@@ -256,7 +255,7 @@ export async function processVideo(file: File) {
 
     return {
       source,
-      subtitles: subttls,
+      subtitles,
       warnings,
     };
   } catch (e) {
