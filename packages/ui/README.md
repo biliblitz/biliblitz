@@ -1,7 +1,7 @@
-# @railgun/ui
+# @moebuta/ui
 
 This is a tailwind plugin library.
 
-Don't be panicked if you find it looks like `shadcn/ui` pretty much, that's where I copied must of the styles from.
+Don't feel strange if you find it looks like `shadcn/ui` pretty much, that's because I copied must of the styles from it.
 
-This library only contains styles.
+This library only contains styles, you need to write user logic yourself.

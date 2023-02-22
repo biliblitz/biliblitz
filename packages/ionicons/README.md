@@ -1,23 +1,23 @@
-# @railgun/heroicons
+# @moebuta/ionicons
 
-[Heroicons](https://github.com/tailwindlabs/heroicons) library for Qwik.
+[Ionicons](https://github.com/ionic-team/ionicons) library for Qwik.
 
-This library only contains 24x24 outlined icons.
+This library only contains outlined icons.
 
 ## Install
 
 ```bash
-yarn add @railgun/heroicons
+yarn add @moebuta/ionicons
 ```
 
 ## Usage
 
-Every components have a prefix `Icon`, and you can pass `class` and `strokeWidth` to it.
+Every components have a prefix `Icon`, and you can pass `class` to it.
 
 Default strokeWidth is set to `2` (original `1.5`).
 
 ```jsx
-import { IconCamera } from "@railgun/heroicons";
+import { IconCamera } from "@moebuta/ionicons";
 
-<IconCamera class="h-4 w-4" strokeWidth={2} />;
+<IconCamera class="h-4 w-4" />;
 ```

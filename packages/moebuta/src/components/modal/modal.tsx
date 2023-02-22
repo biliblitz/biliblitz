@@ -1,6 +1,6 @@
 import type { QwikIntrinsicElements } from "@builder.io/qwik";
 import { component$, Slot } from "@builder.io/qwik";
-import { IconXMark } from "@railgun/heroicons";
+import { IconXMark } from "@moebuta/heroicons";
 
 type Props = {
   id: string;

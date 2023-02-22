@@ -6,8 +6,9 @@ import { tmpdir } from "os";
 import path from "path";
 import { mkdir, rm, writeFile } from "fs/promises";
 import { promisify } from "util";
-import { mkdirSync } from "fs";
+import { accessSync, constants, mkdirSync } from "fs";
 import type { SubtitleSource, VideoSource } from "./db/video";
+import { MOUNT_POINT } from "./envs";
 
 const exec = promisify(_exec);
 
@@ -55,10 +56,9 @@ async function ffprobe(filename: string) {
   });
 }
 
-// TODO
-export const MOUNT_POINT = "/var/railgun";
+accessSync(MOUNT_POINT, constants.R_OK | constants.W_OK);
 
-const tmp = path.join(tmpdir(), "railgun-upload");
+const tmp = path.join(tmpdir(), "mikufans-upload");
 mkdirSync(tmp, { recursive: true });
 
 export async function processVideo(file: File) {
@@ -259,6 +259,9 @@ export async function processVideo(file: File) {
       subtitles: subttls,
       warnings,
     };
+  } catch (e) {
+    await rm(destdir, { recursive: true, force: true });
+    throw e;
   } finally {
     await rm(tmpfile);
   }

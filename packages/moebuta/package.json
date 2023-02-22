@@ -1,5 +1,5 @@
 {
-  "name": "railgun",
+  "name": "moebuta",
   "version": "0.0.1",
   "description": "App with Routing built-in (recommended)",
   "engines": {
@@ -23,10 +23,10 @@
     "qwik": "qwik"
   },
   "dependencies": {
-    "@railgun/heroicons": "^0.0.1",
-    "@railgun/ionicons": "^0.0.1",
-    "@railgun/libass-wasm": "^0.0.1",
-    "@railgun/ui": "^0.0.1",
+    "@moebuta/heroicons": "^0.0.1",
+    "@moebuta/ionicons": "^0.0.1",
+    "@moebuta/libass-wasm": "^0.0.1",
+    "@moebuta/ui": "^0.0.1",
     "mongodb": "^5.0.1"
   },
   "devDependencies": {

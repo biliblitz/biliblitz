@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { Link, loader$ } from "@builder.io/qwik-city";
-import { IconPlus } from "@railgun/heroicons";
+import { IconPlus } from "@moebuta/heroicons";
 import { checkSession } from "~/utils/db/session";
 import { getVideoByUser } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";

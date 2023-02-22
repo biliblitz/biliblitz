@@ -79,5 +79,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Register - Railgun",
+  title: "Register - Moebuta",
 };

@@ -10,7 +10,7 @@ import {
   IconArrowsPointingOut,
   IconPause,
   IconPlay,
-} from "@railgun/heroicons";
+} from "@moebuta/heroicons";
 import {
   IconPlayForward,
   IconText,
@@ -19,7 +19,7 @@ import {
   IconVolumeMedium,
   IconVolumeMute,
   IconVolumeOff,
-} from "@railgun/ionicons";
+} from "@moebuta/ionicons";
 import type { SubtitleSource, VideoSource } from "~/utils/db/video";
 import { IconCircle } from "../icon/icon-circle";
 

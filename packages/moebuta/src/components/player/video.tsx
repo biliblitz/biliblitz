@@ -2,8 +2,8 @@
 
 import type { QwikIntrinsicElements, Signal } from "@builder.io/qwik";
 import { component$, useClientEffect$, useSignal } from "@builder.io/qwik";
-import { IconPlay } from "@railgun/heroicons";
-import SubtitlesOctopus from "@railgun/libass-wasm";
+import { IconPlay } from "@moebuta/heroicons";
+import SubtitlesOctopus from "@moebuta/libass-wasm";
 import type { SubtitleSource, VideoSource } from "~/utils/db/video";
 
 type VideoProps = {

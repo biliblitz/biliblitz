@@ -1,6 +1,6 @@
 import { component$, useClientEffect$, useSignal } from "@builder.io/qwik";
 import { action$, Form, loader$, z, zod$ } from "@builder.io/qwik-city";
-import { IconPlus } from "@railgun/heroicons";
+import { IconPlus } from "@moebuta/heroicons";
 import { ObjectId } from "mongodb";
 import { FormItem } from "~/components/form/form-item";
 import { Heading } from "~/components/heading/heading";

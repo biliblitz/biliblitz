@@ -59,5 +59,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Login - Railgun",
+  title: "Login - Moebuta",
 };

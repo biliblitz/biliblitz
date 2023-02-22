@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "fmt": "yarn workspace @railgun/heroicons run fmt && yarn workspace @railgun/ionicons run fmt && yarn workspace @railgun/ui run fmt && yarn workspace railgun run fmt",
-    "lint": "yarn workspace @railgun/heroicons run lint && yarn workspace @railgun/ionicons run lint && yarn workspace railgun run lint",
-    "build": "yarn workspace @railgun/heroicons run build && yarn workspace @railgun/ionicons run build && yarn workspace @railgun/ui run build && yarn workspace railgun run build"
+    "fmt": "yarn workspace @moebuta/heroicons run fmt && yarn workspace @moebuta/ionicons run fmt && yarn workspace @moebuta/ui run fmt && yarn workspace moebuta run fmt",
+    "lint": "yarn workspace @moebuta/heroicons run lint && yarn workspace @moebuta/ionicons run lint && yarn workspace moebuta run lint",
+    "build": "yarn workspace @moebuta/heroicons run build && yarn workspace @moebuta/ionicons run build && yarn workspace @moebuta/ui run build && yarn workspace moebuta run build"
   },
   "workspaces": [
     "packages/*"

@@ -1,8 +1,42 @@
-# @railgun/libass-wasm
+# @moebuta/libass-wasm
 
-Modified for using in vite.
+`libass-wasm` for modern web framework.
 
-WARNING: Now only god knows how this code works.
+- Added types
+- Inlined wasm file into worker
+- Removed most of direct DOM operations (make frontend framework happy)
+- Vite should work and bundle the worker.
+
+fixes
+
+- fix: subtitle not render immediately after initialize.
+
+## Usage
+
+Html structure
+
+```jsx
+<video ref={videoRef} />
+<div class="relative">
+  <canvas class="pointer-event-none absolute block" ref={canvasRef} />
+</div>
+```
+
+React example
+
+```jsx
+useEffect(() => {
+  const instance = new SubtitleOctopus({
+    video: videoRef.value,
+    canvas: canvasRef.value,
+    subUrl: 'my/ass/file.ass',
+    fonts: ['font.otf', 'font.ttf'],
+  });
+  return () => instance.dispose();
+}, [])
+```
+
+Now hope everything to work. GL&HF.
 
 ---
 

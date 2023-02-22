@@ -1,15 +1,15 @@
 {
-  "name": "@railgun/libass-wasm",
+  "name": "@moebuta/libass-wasm",
   "version": "0.0.1",
   "description": "libass Subtitle Renderer and Parser library for browsers",
-  "main": "dist/js/subtitles-octopus.js",
+  "main": "src/subtitles-octopus.js",
   "type": "module",
   "types": "index.d.ts",
   "files": [
-    "dist/js/subtitles-octopus.js",
-    "dist/js/worker.js",
-    "dist/js/default.woff2",
-    "dist/js/COPYRIGHT"
+    "src/COPYRIGHT",
+    "src/subtitles-octopus.js",
+    "src/subtitles-octopus-worker.js",
+    "assets/default.woff2"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
