@@ -1,3 +1,7 @@
+import { config } from "dotenv";
+
+config();
+
 const ENV_PREFIX = "MOEBUTA_";
 
 function env(name: string) {

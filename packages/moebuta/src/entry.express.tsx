@@ -14,7 +14,7 @@ import express from "express";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import compression from "compression";
-import { MOUNT_POINT } from "./utils/ffmpeg";
+import { MOUNT_POINT } from "./utils/envs";
 
 // Directories where the static assets are located
 const distDir = join(fileURLToPath(import.meta.url), "..", "..", "dist");

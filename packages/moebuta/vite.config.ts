@@ -1,11 +1,12 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import { qwikVite } from "@builder.io/qwik/optimizer";
 import { qwikCity } from "@builder.io/qwik-city/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import serveStatic from "serve-static";
-import { MOUNT_POINT } from "./src/utils/envs";
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+
   return {
     plugins: [
       qwikCity(),
@@ -14,9 +15,13 @@ export default defineConfig(() => {
       {
         name: "static-folder",
         configureServer(server) {
+          const mountPoint = env.MOEBUTA_MOUNT_POINT;
+          if (!mountPoint) {
+            throw new Error("Mount Point not specified");
+          }
           server.middlewares.use(
             "/source",
-            serveStatic(MOUNT_POINT, { immutable: true, maxAge: "1y" })
+            serveStatic(mountPoint, { immutable: true, maxAge: "1y" })
           );
         },
       },
