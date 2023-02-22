@@ -44,7 +44,7 @@ export default function SubtitlesOctopus(options) {
     }
     if (!self.debug) {
       self.dispose();
-      throw new Error("Worker error: " + error);
+      throw error;
     }
   };
 
@@ -52,9 +52,7 @@ export default function SubtitlesOctopus(options) {
   self.init = function () {
     // Worker
     if (!self.worker) {
-      self.worker = new Worker(worker, {
-        type: "module",
-      });
+      self.worker = new Worker(worker, { type: "module" });
       self.worker.addEventListener("message", self.onWorkerMessage);
       self.worker.addEventListener("error", self.workerError);
     }

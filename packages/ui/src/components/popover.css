@@ -69,8 +69,7 @@
 .popover-hover > :focus + .popover-content,
 .popover-hover > :hover + .popover-content,
 .popover-hover:hover > :first-child + .popover-content,
-.popover-content:focus,
-.popover-content:has(:focus) {
+.popover-content:focus {
   @apply visible opacity-100;
   transition-timing-function: ease-in-out, ease-in-out, step-start;
 

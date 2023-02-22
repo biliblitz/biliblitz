@@ -119,6 +119,9 @@ export const Player = component$((props: Props) => {
           volume.value = video.volume;
           muted.value = video.muted;
         }}
+        onRateChange$={(_, video) => {
+          playbackRate.value = video.playbackRate;
+        }}
       />
       <div
         class="controls"
@@ -179,7 +182,7 @@ export const Player = component$((props: Props) => {
           </span>
         </div>
         <div class="controls-right">
-          <span class="icon-wrapper popover popover-hover">
+          <span class="icon-wrapper popover-hover popover">
             <IconPlayForward class="icon" />
             <div class="popover-top-left popover-content cursor-default">
               <menu class="menu">
@@ -188,7 +191,11 @@ export const Player = component$((props: Props) => {
                   return (
                     <li
                       class="menu-item"
-                      onClick$={() => (playbackRate.value = rate)}
+                      onClick$={() => {
+                        if (videoRef.value) {
+                          videoRef.value.playbackRate = rate;
+                        }
+                      }}
                       key={rate}
                     >
                       {playbackRate.value === rate && (
