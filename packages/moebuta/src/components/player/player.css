@@ -36,11 +36,24 @@
 }
 
 .slider {
-  @apply relative h-0.5 w-16 cursor-pointer rounded-full bg-slate-900 transition-all duration-300 after:absolute after:top-1/2 after:h-2 after:w-2 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:bg-slate-800 dark:bg-slate-100 dark:after:bg-slate-100 [:fullscreen_&]:h-1 [:fullscreen_&]:w-24 [:fullscreen_&]:bg-white [:fullscreen_&]:after:h-3 [:fullscreen_&]:after:w-3 [:fullscreen_&]:after:bg-white;
+  @apply relative h-0.5 w-full cursor-pointer rounded-full bg-slate-900 transition-all duration-300 after:absolute after:top-1/2 after:h-2 after:w-2 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:bg-slate-800 dark:bg-slate-100 dark:after:bg-slate-100;
+}
+
+:fullscreen .slider {
+  @apply h-1 bg-white after:h-3 after:w-3 after:bg-white;
 }
 
 .slider::after {
   left: var(--left);
+}
+
+.slider.slider-main,
+:fullscreen .slider.slider-main {
+  @apply after:bg-red-500;
+}
+
+.slider-progress {
+  @apply absolute left-0 top-0 h-full rounded-full;
 }
 
 .fullscreen:not(:fullscreen .fullscreen),

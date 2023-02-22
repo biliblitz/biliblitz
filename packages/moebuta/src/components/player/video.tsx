@@ -40,7 +40,7 @@ export const Video = component$(
     });
 
     return (
-      <div class="relative w-full overflow-hidden bg-white dark:bg-black [:fullscreen_&]:h-full">
+      <div class="relative w-full overflow-hidden bg-black [:fullscreen_&]:h-full">
         <video
           class="w-full object-contain [:fullscreen_&]:h-full"
           ref={(elem) => {
