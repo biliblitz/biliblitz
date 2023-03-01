@@ -30,8 +30,8 @@
     "mongodb": "^5.0.1"
   },
   "devDependencies": {
-    "@builder.io/qwik": "0.17.5",
-    "@builder.io/qwik-city": "0.1.0",
+    "@builder.io/qwik": "0.19.2",
+    "@builder.io/qwik-city": "0.4.0",
     "@types/compression": "^1.7.2",
     "@types/eslint": "8.21.0",
     "@types/express": "4.17.13",

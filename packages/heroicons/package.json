@@ -36,7 +36,7 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@builder.io/qwik": "0.17.5",
+    "@builder.io/qwik": "0.19.2",
     "@types/eslint": "8.21.0",
     "@types/node": "^18.11.19",
     "@types/node-fetch": "latest",
@@ -52,6 +52,6 @@
     "vite": "4.1.1"
   },
   "dependencies": {
-    "@builder.io/qwik": "^0.17.5"
+    "@builder.io/qwik": "^0.19.2"
   }
 }
