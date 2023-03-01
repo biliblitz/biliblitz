@@ -4,8 +4,8 @@ import { action$, Form, Link, z, zod$ } from "@builder.io/qwik-city";
 import { issueSession } from "~/utils/db/session";
 import { userLogin } from "~/utils/db/user";
 
-export const login$ = action$(
-  async (data, event) => {
+export const useLogin = action$(
+  async (data, { cookie, redirect }) => {
     const user = await userLogin(data.username, data.password);
 
     if (!user) {
@@ -13,13 +13,13 @@ export const login$ = action$(
     }
 
     const session = await issueSession(user._id);
-    event.cookie.set("session", session, {
+    cookie.set("session", session, {
       maxAge: [4, "weeks"],
       httpOnly: true,
       path: "/",
     });
 
-    throw event.redirect(302, `/u/${user._id.toHexString()}`);
+    throw redirect(302, `/u/${user._id.toHexString()}`);
   },
   zod$({
     username: z.string().min(1),
@@ -28,7 +28,7 @@ export const login$ = action$(
 );
 
 export default component$(() => {
-  const login = login$.use();
+  const login = useLogin();
 
   return (
     <section class="space-y-4">

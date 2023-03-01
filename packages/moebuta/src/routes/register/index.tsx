@@ -1,32 +1,22 @@
-import { component$, useClientEffect$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import {
-  action$,
-  Form,
-  Link,
-  useNavigate,
-  z,
-  zod$,
-} from "@builder.io/qwik-city";
+import { action$, Form, Link, z, zod$ } from "@builder.io/qwik-city";
 import { MongoServerError } from "mongodb";
 import { userRegister } from "~/utils/db/user";
 
-export const register$ = action$(
-  async (data) => {
+export const useRegister = action$(
+  async (data, { fail, redirect }) => {
     try {
       const result = await userRegister(data.username, data.password);
 
       if (!result.acknowledged) {
-        return { success: false as const, reason: "Permission Denied" };
+        return fail(403, { reason: "Permission Denied" });
       }
 
-      return {
-        success: true as const,
-        userId: result.insertedId.toHexString(),
-      };
+      throw redirect(302, `/u/${result.insertedId.toHexString()}`);
     } catch (e) {
       if (e instanceof MongoServerError && e.code === 11000) {
-        return { success: false as const, reason: "Username is Taken" };
+        return fail(403, { reason: "Username is Taken" });
       } else {
         throw e;
       }
@@ -39,16 +29,7 @@ export const register$ = action$(
 );
 
 export default component$(() => {
-  const register = register$.use();
-  const nav = useNavigate();
-
-  useClientEffect$(({ track }) => {
-    track(() => register.value?.success);
-
-    if (register.value?.success) {
-      nav(`/u/${register.value.userId}`);
-    }
-  });
+  const register = useRegister();
 
   return (
     <section class="space-y-4">

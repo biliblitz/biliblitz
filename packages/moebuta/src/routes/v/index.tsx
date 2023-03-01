@@ -4,13 +4,13 @@ import { Heading } from "~/components/heading/heading";
 import { getPublicVideoRandom } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 
-export const videos$ = loader$(async () => {
+export const useVideos = loader$(async () => {
   const videos = await getPublicVideoRandom();
   return videos.map(serializeObject);
 });
 
 export default component$(() => {
-  const videos = videos$.use();
+  const videos = useVideos();
 
   return (
     <article>

@@ -1,7 +1,11 @@
 //! WARNING: DON'T TOUCH
 
 import type { QwikIntrinsicElements, Signal } from "@builder.io/qwik";
-import { component$, useClientEffect$, useSignal } from "@builder.io/qwik";
+import {
+  component$,
+  useBrowserVisibleTask$,
+  useSignal,
+} from "@builder.io/qwik";
 import { IconPlay } from "@moebuta/heroicons";
 import SubtitlesOctopus from "@moebuta/libass-wasm";
 import type { SubtitleSource, VideoSource } from "~/utils/db/video";
@@ -18,7 +22,7 @@ export const Video = component$(
     const canvasRef = useSignal<HTMLCanvasElement>();
 
     // subtitles
-    useClientEffect$(({ track, cleanup }) => {
+    useBrowserVisibleTask$(({ track, cleanup }) => {
       const video = track(() => videoRef.value);
       const canvas = track(() => canvasRef.value);
       const ass = track(() => subtitle?.type === "ass" && subtitle);

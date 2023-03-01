@@ -1,4 +1,8 @@
-import { component$, useClientEffect$, useSignal } from "@builder.io/qwik";
+import {
+  component$,
+  useBrowserVisibleTask$,
+  useSignal,
+} from "@builder.io/qwik";
 import { action$, Form, loader$, z, zod$ } from "@builder.io/qwik-city";
 import { IconPlus } from "@moebuta/heroicons";
 import { ObjectId } from "mongodb";
@@ -19,7 +23,7 @@ import { zDatetimeLocal, zTimezone } from "~/utils/zod";
 import { Blob } from "buffer";
 import { processVideo } from "~/utils/ffmpeg";
 
-export const video$ = loader$(async ({ params, cookie, error }) => {
+export const useVideo = loader$(async ({ params, cookie, error }) => {
   const id = new ObjectId(params.video);
 
   const user = await checkSession(cookie);
@@ -35,7 +39,7 @@ export const video$ = loader$(async ({ params, cookie, error }) => {
   return serializeObject(video);
 });
 
-export const editVideoProfile$ = action$(
+export const useEditVideoProfile = action$(
   async (data, event) => {
     const video = new ObjectId(event.params.video);
     await updateVideoProfile(video, {
@@ -54,7 +58,7 @@ export const editVideoProfile$ = action$(
   })
 );
 
-export const uploadVideo$ = action$(async (data, { error, fail, params }) => {
+export const useUploadVideo = action$(async (data, { error, fail, params }) => {
   if (!(data.file instanceof Blob)) {
     throw error(402, "Unexpected File");
   }
@@ -81,9 +85,9 @@ export const uploadVideo$ = action$(async (data, { error, fail, params }) => {
 }, zod$({ file: z.any(), name: z.string().min(1) }));
 
 export default component$(() => {
-  const video = video$.use();
-  const editVideoProfile = editVideoProfile$.use();
-  const uploadVideo = uploadVideo$.use();
+  const video = useVideo();
+  const editVideoProfile = useEditVideoProfile();
+  const uploadVideo = useUploadVideo();
 
   // use server timezone here
   const times = useSignal(() => ({
@@ -92,7 +96,7 @@ export default component$(() => {
     createAt: toDatetimeLocal(video.value.createAt),
   }));
   // adjust timezone due to user's preference
-  useClientEffect$(() => {
+  useBrowserVisibleTask$(() => {
     times.value.timezone = new Date().getTimezoneOffset();
     times.value.unlockAt = toDatetimeLocal(video.value.unlockAt);
     times.value.createAt = toDatetimeLocal(video.value.createAt);
@@ -101,7 +105,7 @@ export default component$(() => {
   const createEpisodeModal = useSignal<HTMLInputElement>();
   const successModal = useSignal<HTMLInputElement>();
   const errorModal = useSignal<HTMLInputElement>();
-  useClientEffect$(({ track }) => {
+  useBrowserVisibleTask$(({ track }) => {
     const probe = track(() => uploadVideo.value);
 
     if (probe) {

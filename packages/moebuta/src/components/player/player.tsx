@@ -1,7 +1,7 @@
 import {
   $,
   component$,
-  useClientEffect$,
+  useBrowserVisibleTask$,
   useSignal,
   useStyles$,
 } from "@builder.io/qwik";
@@ -55,7 +55,7 @@ export const Player = component$((props: Props) => {
   const seekTime = useSignal(0);
 
   // init: sync video initial state if element changes
-  useClientEffect$(() => {
+  useBrowserVisibleTask$(() => {
     if (videoRef.value) {
       muted.value = videoRef.value.muted;
       volume.value = videoRef.value.volume;
@@ -68,7 +68,7 @@ export const Player = component$((props: Props) => {
   });
 
   // listen if video changes, reload everything
-  useClientEffect$(({ track }) => {
+  useBrowserVisibleTask$(({ track }) => {
     track(() => props.video);
     if (videoRef.value) {
       videoRef.value.load();
@@ -298,7 +298,7 @@ export const Player = component$((props: Props) => {
           </div>
         </div>
         <div class="controls-right">
-          <span class="icon-wrapper popover-hover popover">
+          <span class="icon-wrapper popover popover-hover">
             <IconPlayForward class="icon" />
             <div class="popover-top-left popover-content cursor-default">
               <menu class="menu">

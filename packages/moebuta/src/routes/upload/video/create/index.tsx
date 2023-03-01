@@ -4,7 +4,7 @@ import { FormItem } from "~/components/form/form-item";
 import { checkSession } from "~/utils/db/session";
 import { createVideo } from "~/utils/db/video";
 
-export const createVideo$ = action$(
+export const useCreateVideo = action$(
   async (data, { cookie, error, redirect }) => {
     const user = await checkSession(cookie);
     if (!user) {
@@ -23,7 +23,7 @@ export const createVideo$ = action$(
 );
 
 export default component$(() => {
-  const createVideo = createVideo$.use();
+  const createVideo = useCreateVideo();
 
   return (
     <div class="space-y-4">

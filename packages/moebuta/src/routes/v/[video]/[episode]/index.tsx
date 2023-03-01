@@ -6,7 +6,7 @@ import { getPublicVideoById } from "~/utils/db/video";
 
 import { serializeObject } from "~/utils/serialize";
 
-export const episode$ = loader$(async ({ params, error }) => {
+export const useEpisode = loader$(async ({ params, error }) => {
   const id = new ObjectId(params.video);
   const video = (await getPublicVideoById(id))!;
 
@@ -20,7 +20,7 @@ export const episode$ = loader$(async ({ params, error }) => {
 });
 
 export default component$(() => {
-  const episode = episode$.use();
+  const episode = useEpisode();
 
   return (
     <Player video={episode.value.source} subtitles={episode.value.subtitles} />

@@ -14,7 +14,7 @@ export const onRequest: RequestHandler = ({ params, error }) => {
   }
 };
 
-export const video$ = loader$(async ({ params, error }) => {
+export const useVideo = loader$(async ({ params, error }) => {
   const id = new ObjectId(params.video);
   const video = await getPublicVideoById(id);
 
@@ -26,7 +26,7 @@ export const video$ = loader$(async ({ params, error }) => {
 });
 
 export default component$(() => {
-  const video = video$.use();
+  const video = useVideo();
 
   return (
     <div class="flex gap-8">

@@ -5,7 +5,7 @@ import { checkSession } from "~/utils/db/session";
 import { getVideoByUser } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 
-export const userVideos$ = loader$(async ({ cookie, redirect }) => {
+export const useUserVideos = loader$(async ({ cookie, redirect }) => {
   const user = await checkSession(cookie);
   if (!user) {
     throw redirect(302, "/login");
@@ -16,7 +16,7 @@ export const userVideos$ = loader$(async ({ cookie, redirect }) => {
 });
 
 export default component$(() => {
-  const userVideos = userVideos$.use();
+  const userVideos = useUserVideos();
 
   return (
     <div>
