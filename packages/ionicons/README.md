@@ -14,8 +14,6 @@ yarn add @moebuta/ionicons
 
 Every components have a prefix `Icon`, and you can pass `class` to it.
 
-Default strokeWidth is set to `2` (original `1.5`).
-
 ```jsx
 import { IconCamera } from "@moebuta/ionicons";
 
