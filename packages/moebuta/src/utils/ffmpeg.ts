@@ -33,15 +33,30 @@ export type Chapter = {
   tags: Record<string, string>;
 };
 
+export type Format = {
+  filename: string;
+  nb_streams: number;
+  nb_programs: number;
+  format_name: string;
+  format_long_name: string;
+  start_time: string;
+  duration: string;
+  size: string;
+  bit_rate: string;
+  probe_score: number;
+  tags: Record<string, string>;
+};
+
 export type Ffprobe = {
   streams: Stream[];
   chapters: Chapter[];
+  format: Format;
 };
 
 async function ffprobe(filename: string) {
   return new Promise<Ffprobe>((resolve, reject) => {
     _exec(
-      `ffprobe -v quiet -print_format json -show_streams -show_chapters ${filename}`,
+      `ffprobe -v quiet -print_format json -show_streams -show_chapters -show_format ${filename}`,
       (err, stdout) => {
         if (err) {
           return reject(err);
@@ -248,9 +263,13 @@ export async function processVideo(file: File) {
     console.log(`$ ${command}`);
     await exec(command);
 
+    const thumbnail = "thumbnail.jpg";
+    await generateThumbnails(destfile, path.join(destdir, thumbnail));
+
     const source: VideoSource = {
       mimetype: mimetype,
       source: `/source/${uuid}/${videoname}`,
+      thumbnail: `/source/${uuid}/${thumbnail}`,
     };
 
     return {
@@ -263,5 +282,20 @@ export async function processVideo(file: File) {
     throw e;
   } finally {
     await rm(tmpfile);
+  }
+}
+
+export async function generateThumbnails(video: string, target: string) {
+  const tmpdir = path.join(tmp, randomUUID());
+  await mkdir(tmpdir, { recursive: true });
+
+  try {
+    const { format } = await ffprobe(video);
+    await exec(
+      `ffmpeg -i "${video}" -f image2 -vf fps=100/${format.duration},scale=160:-1 "${tmpdir}/thumb%03d.jpg"`
+    );
+    await exec(`montage "${tmpdir}/*.jpg" -tile x1 -geometry 160x "${target}"`);
+  } finally {
+    await rm(tmpdir, { recursive: true, force: true });
   }
 }

@@ -4,6 +4,7 @@ import { db } from "../db";
 export type VideoSource = {
   mimetype: string;
   source: string;
+  thumbnail: string;
 };
 
 export type SubtitleSource = {
