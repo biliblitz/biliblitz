@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
-import { IconComputerDesktop, IconVideoCamera } from "@moebuta/heroicons";
+import { HiComputerDesktop, HiVideoCamera } from "@qwikest/icons/heroicons";
 import { NavLink } from "~/components/nav-link/nav-link";
 
 export const Aside = component$(() => {
@@ -12,11 +12,11 @@ export const Aside = component$(() => {
       <nav class="nav">
         <h3 class="nav-title">Videos</h3>
         <NavLink class="nav-item" href="/v">
-          <IconVideoCamera class="h-4 w-4" />
+          <HiVideoCamera class="h-4 w-4" />
           Videos
         </NavLink>
         <NavLink class="nav-item" href="/u/anime">
-          <IconComputerDesktop class="h-4 w-4" />
+          <HiComputerDesktop class="h-4 w-4" />
           Anime
         </NavLink>
       </nav>

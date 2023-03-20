@@ -1,10 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import { Link, loader$ } from "@builder.io/qwik-city";
+import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { Heading } from "~/components/heading/heading";
 import { getPublicVideoRandom } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 
-export const useVideos = loader$(async () => {
+export const useVideos = routeLoader$(async () => {
   const videos = await getPublicVideoRandom();
   return videos.map(serializeObject);
 });

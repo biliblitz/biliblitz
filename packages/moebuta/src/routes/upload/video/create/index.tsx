@@ -1,10 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
+import { routeAction$, Form, z, zod$ } from "@builder.io/qwik-city";
 import { FormItem } from "~/components/form/form-item";
 import { checkSession } from "~/utils/db/session";
 import { createVideo } from "~/utils/db/video";
 
-export const useCreateVideo = action$(
+export const useCreateVideo = routeAction$(
   async (data, { cookie, error, redirect }) => {
     const user = await checkSession(cookie);
     if (!user) {

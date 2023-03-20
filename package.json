@@ -1,11 +1,17 @@
 {
   "private": true,
   "scripts": {
-    "fmt": "yarn workspace @moebuta/heroicons run fmt && yarn workspace @moebuta/ionicons run fmt && yarn workspace @moebuta/ui run fmt && yarn workspace moebuta run fmt",
-    "lint": "yarn workspace @moebuta/heroicons run lint && yarn workspace @moebuta/ionicons run lint && yarn workspace moebuta run lint",
-    "build": "yarn workspace @moebuta/heroicons run build && yarn workspace @moebuta/ionicons run build && yarn workspace @moebuta/ui run build && yarn workspace moebuta run build"
+    "fmt": "pretty-quick",
+    "lint": "yarn workspaces run lint",
+    "build": "yarn workspaces run build"
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "prettier": "^2.8.5",
+    "prettier-plugin-tailwindcss": "^0.2.5",
+    "pretty-quick": "^3.1.3"
+  }
 }

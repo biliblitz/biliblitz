@@ -1,6 +1,6 @@
 import type { QwikIntrinsicElements } from "@builder.io/qwik";
 import { component$, Slot } from "@builder.io/qwik";
-import { IconXMark } from "@moebuta/heroicons";
+import { HiXMark } from "@qwikest/icons/heroicons";
 
 type Props = {
   id: string;
@@ -24,7 +24,7 @@ export const Modal = component$(({ id, closable, ...props }: Props) => {
               tabIndex={0}
               for={id}
             >
-              <IconXMark class="h-4 w-4" />
+              <HiXMark class="h-4 w-4" />
             </label>
           )}
           <Slot />

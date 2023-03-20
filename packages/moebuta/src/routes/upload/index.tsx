@@ -1,11 +1,11 @@
 import { component$ } from "@builder.io/qwik";
-import { Link, loader$ } from "@builder.io/qwik-city";
-import { IconPlus } from "@moebuta/heroicons";
+import { Link, routeLoader$ } from "@builder.io/qwik-city";
+import { HiPlus } from "@qwikest/icons/heroicons";
 import { checkSession } from "~/utils/db/session";
 import { getVideoByUser } from "~/utils/db/video";
 import { serializeObject } from "~/utils/serialize";
 
-export const useUserVideos = loader$(async ({ cookie, redirect }) => {
+export const useUserVideos = routeLoader$(async ({ cookie, redirect }) => {
   const user = await checkSession(cookie);
   if (!user) {
     throw redirect(302, "/login");
@@ -28,7 +28,7 @@ export default component$(() => {
         href="/upload/video/create"
       >
         <div class="space-y-4">
-          <IconPlus class="mx-auto h-16 w-16" />
+          <HiPlus class="mx-auto h-16 w-16" />
           <div>Create a new Video</div>
         </div>
       </Link>

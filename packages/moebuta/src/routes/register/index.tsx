@@ -1,10 +1,10 @@
 import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { action$, Form, Link, z, zod$ } from "@builder.io/qwik-city";
+import { routeAction$, Form, Link, z, zod$ } from "@builder.io/qwik-city";
 import { MongoServerError } from "mongodb";
 import { userRegister } from "~/utils/db/user";
 
-export const useRegister = action$(
+export const useRegister = routeAction$(
   async (data, { fail, redirect }) => {
     try {
       const result = await userRegister(data.username, data.password);

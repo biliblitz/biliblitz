@@ -1,6 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik";
 import type { RequestHandler } from "@builder.io/qwik-city";
-import { loader$ } from "@builder.io/qwik-city";
+import { routeLoader$ } from "@builder.io/qwik-city";
 import { ObjectId } from "mongodb";
 import { NavLink } from "~/components/nav-link/nav-link";
 import { getPublicVideoById } from "~/utils/db/video";
@@ -14,7 +14,7 @@ export const onRequest: RequestHandler = ({ params, error }) => {
   }
 };
 
-export const useVideo = loader$(async ({ params, error }) => {
+export const useVideo = routeLoader$(async ({ params, error }) => {
   const id = new ObjectId(params.video);
   const video = await getPublicVideoById(id);
 

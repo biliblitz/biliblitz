@@ -3,8 +3,14 @@ import {
   useBrowserVisibleTask$,
   useSignal,
 } from "@builder.io/qwik";
-import { action$, Form, loader$, z, zod$ } from "@builder.io/qwik-city";
-import { IconPlus } from "@moebuta/heroicons";
+import {
+  routeAction$,
+  Form,
+  routeLoader$,
+  z,
+  zod$,
+} from "@builder.io/qwik-city";
+import { HiPlus } from "@qwikest/icons/heroicons";
 import { ObjectId } from "mongodb";
 import { FormItem } from "~/components/form/form-item";
 import { Heading } from "~/components/heading/heading";
@@ -23,7 +29,7 @@ import { zDatetimeLocal, zTimezone } from "~/utils/zod";
 import { Blob } from "buffer";
 import { processVideo } from "~/utils/ffmpeg";
 
-export const useVideo = loader$(async ({ params, cookie, error }) => {
+export const useVideo = routeLoader$(async ({ params, cookie, error }) => {
   const id = new ObjectId(params.video);
 
   const user = await checkSession(cookie);
@@ -39,7 +45,7 @@ export const useVideo = loader$(async ({ params, cookie, error }) => {
   return serializeObject(video);
 });
 
-export const useEditVideoProfile = action$(
+export const useEditVideoProfile = routeAction$(
   async (data, event) => {
     const video = new ObjectId(event.params.video);
     await updateVideoProfile(video, {
@@ -58,31 +64,34 @@ export const useEditVideoProfile = action$(
   })
 );
 
-export const useUploadVideo = action$(async (data, { error, fail, params }) => {
-  if (!(data.file instanceof Blob)) {
-    throw error(402, "Unexpected File");
-  }
-  const video = new ObjectId(params.video);
-
-  try {
-    const { warnings, source, subtitles } = await processVideo(
-      data.file as File
-    );
-    for (const warn of warnings) {
-      console.warn(warn);
+export const useUploadVideo = routeAction$(
+  async (data, { error, fail, params }) => {
+    if (!(data.file instanceof Blob)) {
+      throw error(402, "Unexpected File");
     }
+    const video = new ObjectId(params.video);
 
-    await createEpisode(video, data.name, source, subtitles);
+    try {
+      const { warnings, source, subtitles } = await processVideo(
+        data.file as File
+      );
+      for (const warn of warnings) {
+        console.warn(warn);
+      }
 
-    return { warnings };
-  } catch (e) {
-    if (e instanceof Error) {
-      return fail(402, { reason: `Error while process video: ${e.message}` });
-    } else {
-      throw e;
+      await createEpisode(video, data.name, source, subtitles);
+
+      return { warnings };
+    } catch (e) {
+      if (e instanceof Error) {
+        return fail(402, { reason: `Error while process video: ${e.message}` });
+      } else {
+        throw e;
+      }
     }
-  }
-}, zod$({ file: z.any(), name: z.string().min(1) }));
+  },
+  zod$({ file: z.any(), name: z.string().min(1) })
+);
 
 export default component$(() => {
   const video = useVideo();
@@ -177,7 +186,7 @@ export default component$(() => {
           for="new-episode"
           class="grid cursor-pointer place-items-center rounded-md border border-dashed border-slate-300 p-4 opacity-60 transition hover:opacity-100 dark:border-slate-700"
         >
-          <IconPlus class="h-16 w-16" />
+          <HiPlus class="h-16 w-16" />
           <span>Create new episode</span>
         </label>
         <Modal id="new-episode" ref={createEpisodeModal}>

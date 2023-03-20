@@ -1,4 +1,4 @@
-import worker from "./subtitles-octopus-worker?worker&url";
+import AssWorker from "./subtitles-octopus-worker?worker";
 
 export default function SubtitlesOctopus(options) {
   var self = this;
@@ -52,7 +52,7 @@ export default function SubtitlesOctopus(options) {
   self.init = function () {
     // Worker
     if (!self.worker) {
-      self.worker = new Worker(worker, { type: "module" });
+      self.worker = new AssWorker();
       self.worker.addEventListener("message", self.onWorkerMessage);
       self.worker.addEventListener("error", self.workerError);
     }
