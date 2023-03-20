@@ -276,7 +276,7 @@ export const Player = component$((props: Props) => {
             }}
           >
             <div
-              class="slider-progress bg-red-300 transition-all"
+              class="slider-progress slider-buffer"
               style={{
                 width: isNaN(duration.value)
                   ? "0%"
@@ -298,7 +298,7 @@ export const Player = component$((props: Props) => {
           </div>
         </div>
         <div class="controls-right">
-          <span class="icon-wrapper popover popover-hover">
+          <span class="icon-wrapper popover-hover popover">
             <IconPlayForward class="icon" />
             <div class="popover-top-left popover-content cursor-default">
               <menu class="menu">

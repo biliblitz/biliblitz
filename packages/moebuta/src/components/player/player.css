@@ -68,3 +68,15 @@
 .player:fullscreen .controls {
   background-image: linear-gradient(to top, #000000aa, transparent);
 }
+
+:fullscreen .slider.slider-main {
+  @apply bg-[rgba(255,255,255,.1)];
+}
+
+.slider-progress.slider-buffer {
+  @apply bg-red-300 transition-all;
+}
+
+:fullscreen .slider-progress.slider-buffer {
+  @apply bg-[rgba(255,255,255,.2)];
+}
