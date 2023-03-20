@@ -2,8 +2,10 @@
   "private": true,
   "scripts": {
     "fmt": "pretty-quick",
+    "fmt.staged": "pretty-quick --staged",
     "lint": "yarn workspaces run lint",
-    "build": "yarn workspaces run build"
+    "build": "yarn workspaces run build",
+    "postinstall": "husky install"
   },
   "workspaces": [
     "packages/*"
