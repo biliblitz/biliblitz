@@ -26,9 +26,6 @@ import type { SubtitleSource, VideoSource } from "../types";
 
 import { Video } from "./video";
 
-import "./player.css";
-import style from "./player.module.css";
-
 type Props = {
   video: VideoSource;
   subtitles?: SubtitleSource[];
@@ -206,26 +203,26 @@ export const Player = component$((props: Props) => {
         {/* left */}
         <div class="inline-flex gap-2">
           {/* play/pause button */}
-          <span onClick$={togglePlay} class={style.button}>
+          <span onClick$={togglePlay} class="cursor-pointer p-2">
             {playing.value ? (
-              <HiPause class={style.icon} />
+              <HiPause class="h-6 w-6 drop-shadow" />
             ) : (
-              <HiPlay class={style.icon} />
+              <HiPlay class="h-6 w-6 drop-shadow" />
             )}
           </span>
 
           {/* Volume slider */}
-          <span onClick$={toggleMute} class={style.button}>
+          <span onClick$={toggleMute} class="cursor-pointer p-2">
             {muted.value ? (
-              <IoVolumeMute class={style.icon} />
+              <IoVolumeMute class="h-6 w-6 drop-shadow" />
             ) : volume.value < 0.2 ? (
-              <IoVolumeOff class={style.icon} />
+              <IoVolumeOff class="h-6 w-6 drop-shadow" />
             ) : volume.value < 0.5 ? (
-              <IoVolumeLow class={style.icon} />
+              <IoVolumeLow class="h-6 w-6 drop-shadow" />
             ) : volume.value < 0.7 ? (
-              <IoVolumeMedium class={style.icon} />
+              <IoVolumeMedium class="h-6 w-6 drop-shadow" />
             ) : (
-              <IoVolumeHigh class={style.icon} />
+              <IoVolumeHigh class="h-6 w-6 drop-shadow" />
             )}
           </span>
 
@@ -309,8 +306,8 @@ export const Player = component$((props: Props) => {
         {/* right controls */}
         <div class="inline-flex gap-2">
           {/* playback rate select button */}
-          <span class={style.button}>
-            <IoPlayForward class={style.icon} />
+          <span class="cursor-pointer p-2">
+            <IoPlayForward class="h-6 w-6 drop-shadow" />
             <div class="hidden">
               <menu class="menu">
                 <h3 class="menu-title">Speed</h3>
@@ -336,8 +333,8 @@ export const Player = component$((props: Props) => {
             </div>
           </span>
           {/* Subtitle select button */}
-          <span class={style.button}>
-            <IoText class={style.icon} />
+          <span class="cursor-pointer p-2">
+            <IoText class="h-6 w-6 drop-shadow" />
             <div class="hidden">
               <menu class="menu">
                 <h3 class="menu-title">Subtitles</h3>
@@ -357,6 +354,7 @@ export const Player = component$((props: Props) => {
                       { checked: subtitle.value?.source === _subtitle.source },
                     ]}
                     onClick$={() => (subtitle.value = _subtitle)}
+                    key={_subtitle.language}
                   >
                     {_subtitle.title}
                   </li>
@@ -365,7 +363,7 @@ export const Player = component$((props: Props) => {
             </div>
           </span>
           {/* fullscreen change button */}
-          <span onClick$={toggleFullscreen} class={style.button}>
+          <span onClick$={toggleFullscreen} class="cursor-pointer p-2">
             <HiArrowsPointingOut class="h-6 w-6 drop-shadow group-[:fullscreen]:hidden" />
             <HiArrowsPointingIn class="h-6 w-6 drop-shadow group-[:not(:fullscreen)]:hidden" />
           </span>

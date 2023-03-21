@@ -1,47 +1,28 @@
-# Qwik Library ⚡️
+# @moebuta/player
 
-- [Qwik Docs](https://qwik.builder.io/)
-- [Discord](https://qwik.builder.io/chat)
-- [Qwik on GitHub](https://github.com/BuilderIO/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
-- [Partytown](https://partytown.builder.io/)
-- [Mitosis](https://github.com/BuilderIO/mitosis)
-- [Builder.io](https://www.builder.io/)
+A player for [Qwik](https://qwik.builder.io) framework.
 
----
+Features beyond raw `<video />` player:
 
-## Project Structure
+- Support `ASS` subtitle format (via [@moebuta/libass-wasm][]).
+- Controller for playback rate adjust.
+- Controller for multiple subtitle track switch.
 
-Inside of you project, you'll see the following directories and files:
+## Install
 
 ```
-├── public/
-│   └── ...
-└── src/
-    ├── components/
-    │   └── ...
-    └── index.ts
+yarn add @moebuta/player
 ```
 
-- `src/components`: Recommended directory for components.
+Then add `./node_modules/@moebuta/player/lib/*.{cjs,mjs}` to you tailwind config content.
 
-- `index.ts`: This is the entry point of your component library, make sure all the public components are exported from this file.
+~~You must be using tailwind, right?~~
 
-## Development
-
-Development mode uses [Vite's development server](https://vitejs.dev/). For Qwik during development, the `dev` command will also server-side render (SSR) the output. The client-side development modules loaded by the browser.
-
+```js
+// tailwind.config.js
+module.exports = {
+  content: ["./node_modules/@moebuta/player/lib/*.{cjs,mjs}"],
+};
 ```
-yarn dev
-```
 
-> Note: during dev mode, Vite will request many JS files, which does not represent a Qwik production build.
-
-## Production
-
-The production build should generate the production build of your component library in (./lib) and the typescript type definitions in (./lib-types).
-
-```
-yarn build
-```
+[@moebuta/libass-wasm]: https://www.npmjs.com/package/@moebuta/libass-wasm

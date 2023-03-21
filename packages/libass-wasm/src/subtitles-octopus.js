@@ -1,5 +1,3 @@
-import AssWorker from "./subtitles-octopus-worker?worker";
-
 export default function SubtitlesOctopus(options) {
   var self = this;
   self.canvas = options.canvas; // HTML canvas element (optional if video specified)
@@ -52,7 +50,9 @@ export default function SubtitlesOctopus(options) {
   self.init = function () {
     // Worker
     if (!self.worker) {
-      self.worker = new AssWorker();
+      self.worker = new Worker(
+        new URL("./subtitles-octopus-worker.js", import.meta.url)
+      );
       self.worker.addEventListener("message", self.onWorkerMessage);
       self.worker.addEventListener("error", self.workerError);
     }

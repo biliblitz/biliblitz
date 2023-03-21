@@ -1,7 +1,0 @@
-.button {
-  @apply cursor-pointer p-2;
-}
-
-.icon {
-  @apply h-6 w-6 drop-shadow;
-}
