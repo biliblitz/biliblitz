@@ -43,7 +43,7 @@ export default component$(() => {
               class="nav-item"
               key={index}
               title={episode.name}
-              href={`/v/${video.value._id}/${index}`}
+              href={`/v/${video.value._id}/${index}/`}
             >
               <span class="overflow-hidden text-ellipsis">
                 #{index + 1} {episode.name}
