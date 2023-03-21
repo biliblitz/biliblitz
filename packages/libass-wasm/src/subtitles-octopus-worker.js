@@ -2385,7 +2385,10 @@ function isFileURI(filename) {
   return filename.startsWith("file://");
 }
 var wasmBinaryFile;
-wasmBinaryFile = new URL("./libass-wasm.wasm", import.meta.url);
+// get file name from assets
+wasmBinaryFile = new URL("./libass-wasm.wasm", import.meta.url).pathname
+  .split("/")
+  .pop();
 if (!isDataURI(wasmBinaryFile)) {
   wasmBinaryFile = locateFile(wasmBinaryFile);
 }

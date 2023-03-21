@@ -333,34 +333,22 @@ export const Player = component$((props: Props) => {
             </div>
           </span>
           {/* Subtitle select button */}
-          <span class="cursor-pointer p-2">
+          <span
+            class="cursor-pointer p-2"
+            onClick$={() => {
+              if (!subtitle.value) {
+                subtitle.value = subtitles[0];
+              } else {
+                const index = subtitles.indexOf(subtitle.value);
+                if (index + 1 === subtitles.length) {
+                  subtitle.value = undefined;
+                } else {
+                  subtitle.value = subtitles[index + 1];
+                }
+              }
+            }}
+          >
             <IoText class="h-6 w-6 drop-shadow" />
-            <div class="hidden">
-              <menu class="menu">
-                <h3 class="menu-title">Subtitles</h3>
-                <li
-                  class={[
-                    "menu-radio text-opacity-60",
-                    { checked: !subtitle.value },
-                  ]}
-                  onClick$={() => (subtitle.value = undefined)}
-                >
-                  Off
-                </li>
-                {subtitles.map((_subtitle) => (
-                  <li
-                    class={[
-                      "menu-radio",
-                      { checked: subtitle.value?.source === _subtitle.source },
-                    ]}
-                    onClick$={() => (subtitle.value = _subtitle)}
-                    key={_subtitle.language}
-                  >
-                    {_subtitle.title}
-                  </li>
-                ))}
-              </menu>
-            </div>
           </span>
           {/* fullscreen change button */}
           <span onClick$={toggleFullscreen} class="cursor-pointer p-2">

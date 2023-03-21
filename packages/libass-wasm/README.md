@@ -5,11 +5,17 @@
 - Added types
 - Inlined wasm file into worker
 - Removed most of direct DOM operations (make frontend framework happy)
-- Vite should work and bundle the worker.
+- Vite should be able to bundle the worker and wasm.
 
 fixes
 
 - fix: subtitle not render immediately after initialize.
+
+## Library
+
+For Qwik usage, see [@moebuta/player][].
+
+[@moebuta/player]: https://npmjs.com/package/@moebuta/player
 
 ## Usage
 
@@ -29,11 +35,11 @@ useEffect(() => {
   const instance = new SubtitleOctopus({
     video: videoRef.value,
     canvas: canvasRef.value,
-    subUrl: 'my/ass/file.ass',
-    fonts: ['font.otf', 'font.ttf'],
+    subUrl: "my/ass/file.ass",
+    fonts: ["font.otf", "font.ttf"],
   });
   return () => instance.dispose();
-}, [])
+}, []);
 ```
 
 Now hope everything to work. GL&HF.
@@ -41,7 +47,6 @@ Now hope everything to work. GL&HF.
 ---
 
 [![Actions Status](https://github.com/libass/JavascriptSubtitlesOctopus/actions/workflows/emscripten.yml/badge.svg)](https://github.com/libass/JavascriptSubtitlesOctopus/actions/workflows/emscripten.yml?query=branch%3Amaster+event%3Apush)
-
 
 SubtitlesOctopus displays subtitles in .ass format and easily integrates with HTML5 videos.
 Since it uses [libass](https://github.com/libass/libass), SubtitlesOctopus supports most
@@ -64,13 +69,13 @@ provided libass is also used locally.
 
 ## Included Libraries
 
-* libass
-* expat
-* fontconfig
-* freetype
-* fribidi
-* harfbuzz
-* brotli
+- libass
+- expat
+- fontconfig
+- freetype
+- fribidi
+- harfbuzz
+- brotli
 
 ## Usage
 
@@ -79,11 +84,11 @@ To start using SubtitlesOctopus you only need to instantiate a new instance of
 
 ```javascript
 var options = {
-    video: document.getElementById('video'), // HTML5 video element
-    subUrl: '/test/test.ass', // Link to subtitles
-    fonts: ['/test/font-1.ttf', '/test/font-2.ttf'], // Links to fonts (not required, default font already included in build)
-    workerUrl: '/libassjs-worker.js', // Link to WebAssembly-based file "libassjs-worker.js"
-    legacyWorkerUrl: '/libassjs-worker-legacy.js' // Link to non-WebAssembly worker
+  video: document.getElementById("video"), // HTML5 video element
+  subUrl: "/test/test.ass", // Link to subtitles
+  fonts: ["/test/font-1.ttf", "/test/font-2.ttf"], // Links to fonts (not required, default font already included in build)
+  workerUrl: "/libassjs-worker.js", // Link to WebAssembly-based file "libassjs-worker.js"
+  legacyWorkerUrl: "/libassjs-worker-legacy.js", // Link to non-WebAssembly worker
 };
 var instance = new SubtitlesOctopus(options);
 ```
@@ -94,15 +99,16 @@ to display subtitles. You can use it with any HTML5 player.
 [See other examples](https://github.com/libass/JavascriptSubtitlesOctopus/tree/gh-pages/).
 
 ### Using only with canvas
+
 You're also able to use it without any video. However, that requires you to set
 the time the subtitles should render at yourself:
 
 ```javascript
 var options = {
-    canvas: document.getElementById('canvas'), // canvas element
-    subUrl: '/test/test.ass', // Link to subtitles
-    fonts: ['/test/font-1.ttf', '/test/font-2.ttf'], // Links to fonts (not required, default font already included in build)
-    workerUrl: '/libassjs-worker.js' // Link to file "libassjs-worker.js"
+  canvas: document.getElementById("canvas"), // canvas element
+  subUrl: "/test/test.ass", // Link to subtitles
+  fonts: ["/test/font-1.ttf", "/test/font-2.ttf"], // Links to fonts (not required, default font already included in build)
+  workerUrl: "/libassjs-worker.js", // Link to file "libassjs-worker.js"
 };
 var instance = new SubtitlesOctopus(options);
 // And then...
@@ -110,6 +116,7 @@ instance.setCurrentTime(15); // Render subtitles at 00:15 on your canvas
 ```
 
 ### Changing subtitles
+
 You're not limited to only display the subtitle file you referenced in your
 options. You're able to dynamically change subtitles on the fly. There's three
 methods that you can use for this specifically:
@@ -129,6 +136,7 @@ instance.setTrackByUrl('/test/railgun_op.ass');
 ```
 
 ### Cleaning up the object
+
 After you're finished with rendering the subtitles. You need to call the
 `instance.dispose()` method to correctly dispose of the object.
 
@@ -140,8 +148,8 @@ var instance = new SubtitlesOctopus(options);
 instance.dispose();
 ```
 
-
 ### Options
+
 When creating an instance of SubtitleOctopus, you can set the following options:
 
 - `video`: The video element to attach listeners to. (Optional)
@@ -173,30 +181,33 @@ When creating an instance of SubtitleOctopus, you can set the following options:
   - `lossy` - Lossy Render Mode (EXPERIMENTAL)
 - `targetFps`: Target FPS (Default: `24`)
 - `libassMemoryLimit`: libass bitmap cache memory limit in MiB (approximate)
-                       (Default: `0` - no limit)
+  (Default: `0` - no limit)
 - `libassGlyphLimit`: libass glyph cache memory limit in MiB (approximate)
-                      (Default: `0` - no limit)
+  (Default: `0` - no limit)
 - `prescaleFactor`: Scale down (`< 1.0`) the subtitles canvas to improve
-                    performance at the expense of quality, or scale it up (`> 1.0`).
-                    (Default: `1.0` - no scaling; must be a number > 0)
+  performance at the expense of quality, or scale it up (`> 1.0`).
+  (Default: `1.0` - no scaling; must be a number > 0)
 - `prescaleHeightLimit`: The height beyond which the subtitles canvas won't be prescaled.
-                         (Default: `1080`)
+  (Default: `1080`)
 - `maxRenderHeight`: The maximum rendering height of the subtitles canvas.
-                     Beyond this subtitles will be upscaled by the browser.
-                     (Default: `0` - no limit)
+  Beyond this subtitles will be upscaled by the browser.
+  (Default: `0` - no limit)
 - `dropAllAnimations`: If set to true, attempt to discard all animated tags.
-                       Enabling this may severly mangle complex subtitles and
-                       should only be considered as an last ditch effort of uncertain success
-                       for hardware otherwise incapable of displaing anything.
-                       Will not reliably work with manually edited or allocated events.
-                       (Default: `false` - do nothing)
+  Enabling this may severly mangle complex subtitles and
+  should only be considered as an last ditch effort of uncertain success
+  for hardware otherwise incapable of displaing anything.
+  Will not reliably work with manually edited or allocated events.
+  (Default: `false` - do nothing)
 
 ### Rendering Modes
+
 #### JS Blending
+
 To use this mode set `renderMode` to `js-blend` upon instance creation.
 This will do all the processing of the bitmaps produced by libass outside of WebAssembly.
 
 #### WASM Blending
+
 To use this mode set `renderMode` to `wasm-blend` upon instance creation.
 This will blend the bitmaps of the different events together in WebAssembly,
 so the JavaScript-part only needs to process a single image.
@@ -206,6 +217,7 @@ Without WebAssembly-support it will fallback to asm.js and
 should at least not be slower than the default mode.
 
 #### Lossy Render Mode (EXPERIMENTAL)
+
 To use this mode set `renderMode` to `lossy` upon instance creation.
 The Lossy Render mode has been created by @no1d as a suggestion for fix browser
 freezing when rendering heavy subtitles (#46), it uses
@@ -218,8 +230,8 @@ simply will not draw anything in canvas, mostly on low end devices.
 
 **WARNING: Experimental, not stable and not working in some browsers**
 
-
 ### Brotli Compressed Subtitles (DEPRECATED)
+
 Manual support for brotli-compressed subtitles is tentatively deprecated
 and may be removed with the next release.
 
@@ -233,41 +245,48 @@ with a `.br` extension.
 ## How to build?
 
 ### Dependencies
-* git
-* emscripten (Configure the enviroment)
-* make
-* python3
-* cmake
-* pkgconfig
-* patch
-* libtool
-* autotools (autoconf, automake, autopoint)
-* gettext
-* ragel - Required by Harfbuzz
-* itstool - Required by Fontconfig
-* python3-ply - Required by WebIDL
-* gperf - Required by Fontconfig
-* licensecheck
+
+- git
+- emscripten (Configure the enviroment)
+- make
+- python3
+- cmake
+- pkgconfig
+- patch
+- libtool
+- autotools (autoconf, automake, autopoint)
+- gettext
+- ragel - Required by Harfbuzz
+- itstool - Required by Fontconfig
+- python3-ply - Required by WebIDL
+- gperf - Required by Fontconfig
+- licensecheck
 
 ### Get the Source
 
 Run `git clone --recursive https://github.com/libass/JavascriptSubtitlesOctopus.git`
 
 ### Build inside a Container
+
 #### Docker
-1) Install Docker
-2) `./run-docker-build.sh`
-3) Artifacts are in /dist/js
+
+1. Install Docker
+2. `./run-docker-build.sh`
+3. Artifacts are in /dist/js
+
 #### Buildah
-1) Install Buildah and a suitable backend for `buildah run` like `crun` or `runc`
-2) `./run-buildah-build.sh`
-3) Artifacts are in /dist/js
+
+1. Install Buildah and a suitable backend for `buildah run` like `crun` or `runc`
+2. `./run-buildah-build.sh`
+3. Artifacts are in /dist/js
 
 ### Build without Containers
-1) Install the dependency packages listed above
-2) `make`
-    - If on macOS with libtool from brew, `LIBTOOLIZE=glibtoolize make`
-3) Artifacts are in /dist/js
+
+1. Install the dependency packages listed above
+2. `make`
+   - If on macOS with libtool from brew, `LIBTOOLIZE=glibtoolize make`
+3. Artifacts are in /dist/js
 
 ## Why "Octopus"?
+
 How am I an Octopus? [Ba da ba da ba!](https://www.youtube.com/watch?v=tOzOD-82mW0)
