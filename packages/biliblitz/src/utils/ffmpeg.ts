@@ -7,7 +7,7 @@ import path from "path";
 import { mkdir, rm, writeFile } from "fs/promises";
 import { promisify } from "util";
 import { accessSync, constants, mkdirSync } from "fs";
-import type { SubtitleSource, VideoSource } from "./db/video";
+import type { SubtitleSource, VideoSource } from "@biliblitz/player";
 import { MOUNT_POINT } from "./envs";
 
 const exec = promisify(_exec);

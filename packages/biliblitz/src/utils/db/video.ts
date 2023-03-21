@@ -1,19 +1,6 @@
+import type { SubtitleSource, VideoSource } from "@biliblitz/player";
 import type { ObjectId, UpdateFilter, WithId } from "mongodb";
 import { db } from "../db";
-
-export type VideoSource = {
-  mimetype: string;
-  source: string;
-  thumbnail: string;
-};
-
-export type SubtitleSource = {
-  type: "srt" | "webvtt" | "ass";
-  title: string;
-  language: string;
-  source: string;
-  fonts: string[];
-};
 
 export type Episode = {
   name: string;

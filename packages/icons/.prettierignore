@@ -1,0 +1,11 @@
+# Files Prettier should not format
+**/*.log
+**/.DS_Store
+*.
+lib
+lib-types
+dist
+node_modules
+
+src/icons
+src/index.ts
