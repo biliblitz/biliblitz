@@ -2,7 +2,7 @@ import { config } from "dotenv";
 
 config();
 
-const ENV_PREFIX = "MOEBUTA_";
+const ENV_PREFIX = "BILIBLITZ_";
 
 function env(name: string) {
   const envname = ENV_PREFIX + name;

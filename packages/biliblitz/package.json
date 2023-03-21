@@ -1,10 +1,11 @@
 {
-  "name": "moebuta",
+  "name": "biliblitz",
   "version": "0.0.1",
   "description": "App with Routing built-in (recommended)",
   "engines": {
     "node": ">=15.0.0"
   },
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "qwik build",
@@ -23,7 +24,7 @@
     "qwik": "qwik"
   },
   "dependencies": {
-    "@moebuta/player": "^0.0.1",
+    "@biliblitz/player": "^0.0.1",
     "mongodb": "^5.0.1"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 {
-  "name": "@moebuta/libass-wasm",
+  "name": "@biliblitz/libass-wasm",
   "version": "0.0.1",
   "description": "libass Subtitle Renderer and Parser library for browsers",
   "main": "./src/subtitles-octopus.js",
@@ -12,20 +12,15 @@
     }
   },
   "files": [
-    "src/COPYRIGHT",
-    "src/subtitles-octopus.js",
-    "src/subtitles-octopus-worker.js",
-    "src/libass-wasm.wasm",
-    "index.d.ts",
-    "assets/default.woff2"
+    "src",
+    "index.d.ts"
   ],
   "scripts": {
-    "build": "exit 0",
-    "lint": "exit 0"
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swwind/moebuta.git"
+    "url": "git+https://github.com/swwind/biliblitz.git"
   },
   "keywords": [
     "libass",
@@ -36,7 +31,7 @@
   "author": "SubtitlesOctopus contributors",
   "license": "LGPL-2.1-or-later AND (FTL OR GPL-2.0-or-later) AND MIT AND MIT-Modern-Variant AND ISC AND NTP AND Zlib AND BSL-1.0",
   "bugs": {
-    "url": "https://github.com/swwind/moebuta/issues"
+    "url": "https://github.com/swwind/biliblitz/issues"
   },
-  "homepage": "https://github.com/swwind/moebuta/"
+  "homepage": "https://github.com/swwind/biliblitz/"
 }

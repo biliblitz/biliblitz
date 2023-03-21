@@ -1,5 +1,5 @@
 {
-  "name": "@moebuta/player",
+  "name": "@biliblitz/player",
   "version": "0.0.1",
   "description": "Create a reusable Qwik component library",
   "main": "./lib/index.qwik.mjs",
@@ -20,6 +20,7 @@
     "node": ">=15.0.0"
   },
   "private": false,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "qwik build",
@@ -29,11 +30,12 @@
     "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "lint": "eslint \"src/**/*.ts*\"",
     "start": "vite --open --mode ssr",
-    "qwik": "qwik"
+    "qwik": "qwik",
+    "publish": "npm publish"
   },
   "devDependencies": {
     "@builder.io/qwik": "0.23.0",
-    "@moebuta/libass-wasm": "^0.0.1",
+    "@biliblitz/libass-wasm": "^0.0.1",
     "@qwikest/icons": "^0.0.5",
     "@types/eslint": "8.21.2",
     "@types/node": "^18.15.3",

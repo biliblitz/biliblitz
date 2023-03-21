@@ -17,7 +17,12 @@ export default function SubtitlesOctopus(options) {
   self.canvasParent = null; // (internal) HTML canvas parent element
   self.fonts = options.fonts || []; // Array with links to fonts used in sub (optional)
   self.availableFonts = options.availableFonts || []; // Object with all available fonts (optional). Key is font name in lower case, value is link: {"arial": "/font1.ttf"}
-  self.fallbackFont = options.fallbackFont || "default.woff2"; // URL to override fallback font, for example, with a CJK one. Default fallback font is Liberation Sans (Optional)
+  self.fallbackFont =
+    options.fallbackFont ||
+    // default font
+    new URL("./assets/default.woff2", import.meta.url).pathname
+      .split("/")
+      .pop(); // URL to override fallback font, for example, with a CJK one. Default fallback font is Liberation Sans (Optional)
   self.lazyFileLoading = options.lazyFileLoading || false; // Load fonts in a lazy way. Requires Access-Control-Expose-Headers for Accept-Ranges, Content-Length, and Content-Encoding. If Content-Encoding is compressed, file will be fully fetched instead of just a HEAD request.
   self.onReadyEvent = options.onReady; // Function called when SubtitlesOctopus is ready (optional)
   // if (supportsWebAssembly) {

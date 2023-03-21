@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
       {
         name: "static-folder",
         configureServer(server) {
-          const mountPoint = env.MOEBUTA_MOUNT_POINT;
+          const mountPoint = env.BILIBLITZ_MOUNT_POINT;
           if (!mountPoint) {
             throw new Error("Mount Point not specified");
           }

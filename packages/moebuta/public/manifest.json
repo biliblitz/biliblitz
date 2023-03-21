@@ -1,9 +1,0 @@
-{
-  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "Moebuta - Share your media",
-  "short_name": "moebuta",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#fff",
-  "description": "Moebuta is a website where you can share your video and audio, as well as send posts."
-}

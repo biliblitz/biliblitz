@@ -3,8 +3,9 @@
   "scripts": {
     "fmt": "pretty-quick",
     "fmt.staged": "pretty-quick --staged",
-    "lint": "yarn workspaces run lint",
-    "build": "yarn workspaces run build",
+    "lint": "./scripts/lint.sh",
+    "build": "./scripts/build.sh",
+    "publish": "./scripts/publish.sh",
     "postinstall": "husky install"
   },
   "workspaces": [

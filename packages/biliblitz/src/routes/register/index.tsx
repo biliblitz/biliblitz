@@ -60,5 +60,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Register - Moebuta",
+  title: "Register - biliblitz",
 };

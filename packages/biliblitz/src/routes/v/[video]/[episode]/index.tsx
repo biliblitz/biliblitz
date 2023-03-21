@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { ObjectId } from "mongodb";
-import { Player } from "@moebuta/player";
+import { Player } from "@biliblitz/player";
 import { getPublicVideoById } from "~/utils/db/video";
 
 import { serializeObject } from "~/utils/serialize";

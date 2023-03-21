@@ -73,7 +73,7 @@ async function ffprobe(filename: string) {
 
 accessSync(MOUNT_POINT, constants.R_OK | constants.W_OK);
 
-const tmp = path.join(tmpdir(), "moebuta-upload");
+const tmp = path.join(tmpdir(), "biliblitz-upload");
 mkdirSync(tmp, { recursive: true });
 
 export async function processVideo(file: File) {

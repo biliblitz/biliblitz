@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "biliblitz - Share your media",
+  "short_name": "biliblitz",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "biliblitz is a website where you can share your video and audio, as well as send posts."
+}

@@ -11,7 +11,7 @@ export default defineConfig(() => {
         fileName: (format) => `index.qwik.${format === "es" ? "mjs" : "cjs"}`,
       },
       rollupOptions: {
-        external: ["@moebuta/libass-wasm"],
+        external: ["@biliblitz/libass-wasm"],
       },
     },
     plugins: [qwikVite()],

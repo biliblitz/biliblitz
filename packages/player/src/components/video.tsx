@@ -6,7 +6,7 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { component$, useSignal } from "@builder.io/qwik";
-import SubtitlesOctopus from "@moebuta/libass-wasm";
+import SubtitlesOctopus from "@biliblitz/libass-wasm";
 import { HiPlay } from "@qwikest/icons/heroicons";
 import type { SubtitleSource, VideoSource } from "../types";
 

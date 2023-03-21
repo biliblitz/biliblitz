@@ -1,11 +1,10 @@
-# @moebuta/libass-wasm
+# @biliblitz/libass-wasm
 
-`libass-wasm` for modern web framework.
+[`libass-wasm`][libass-wasm] for modern web framework.
 
 - Added types
-- Inlined wasm file into worker
 - Removed most of direct DOM operations (make frontend framework happy)
-- Vite should be able to bundle the worker and wasm.
+- Hard linked worker, wasm and font assets (make vite bundler happy)
 
 fixes
 
@@ -13,9 +12,10 @@ fixes
 
 ## Library
 
-For Qwik usage, see [@moebuta/player][].
+For Qwik usage, see [@biliblitz/player][].
 
-[@moebuta/player]: https://npmjs.com/package/@moebuta/player
+[libass-wasm]: https://npmjs.com/package/libass-wasm
+[@biliblitz/player]: https://npmjs.com/package/@biliblitz/player
 
 ## Usage
 
@@ -31,6 +31,10 @@ Html structure
 React example
 
 ```jsx
+// just import it and use
+// vite should be able to bundle the worker, font and wasm files for you.
+import SubtitleOctopus from "@biliblitz/libass-wasm";
+
 useEffect(() => {
   const instance = new SubtitleOctopus({
     video: videoRef.value,
