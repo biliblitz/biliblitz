@@ -25,6 +25,7 @@ import type { SubtitleSource, VideoSource } from "../types";
 import Ass from "./ass";
 
 import style from "./player.css?inline";
+import { formatTime2 } from "../utils/time";
 
 type Props = {
   video: VideoSource[];
@@ -114,17 +115,6 @@ export const Player = component$<Props>((props) => {
     state.buffered = buff;
   });
 
-  const finishSeeking = $(() => {
-    if (seeking.value) {
-      seeking.value = false;
-      if (videoRef.value) {
-        state.currentTime = seekTime.value;
-        videoRef.value.currentTime = seekTime.value;
-        videoRef.value.play();
-      }
-    }
-  });
-
   const playingPercent = useComputed$(() =>
     isNaN(state.duration)
       ? 0
@@ -145,8 +135,8 @@ export const Player = component$<Props>((props) => {
       class={[
         "group relative aspect-video",
         {
-          playing: state.playing,
-          inactive: playerInactive.value && false,
+          playing: state.playing || seeking.value,
+          inactive: playerInactive.value,
         },
       ]}
       ref={playerRef}
@@ -182,6 +172,7 @@ export const Player = component$<Props>((props) => {
           onProgress$={(_, video) => updateProgress(video)}
           preventdefault:keydown
           onKeyDown$={(event, video) => {
+            console.log(event.key);
             if (event.key === "ArrowLeft") {
               video.currentTime -= 5;
             } else if (event.key === "ArrowRight") {
@@ -190,7 +181,7 @@ export const Player = component$<Props>((props) => {
               video.volume = Math.min(video.volume + 0.1, 1);
             } else if (event.key === "ArrowDown") {
               video.volume = Math.max(video.volume - 0.1, 0);
-            } else if (event.key === "Space") {
+            } else if (event.key === " ") {
               video.paused ? video.play() : video.pause();
             }
           }}
@@ -216,52 +207,45 @@ export const Player = component$<Props>((props) => {
         </div>
       </div>
 
-      <div class="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/20 to-transparent p-2 text-white transition-[opacity] group-[.inactive]:opacity-0">
+      {/* bottom controller */}
+      <div class="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/20 to-transparent p-2 text-white transition-[opacity] group-[.inactive]:opacity-0 group-[.inactive]:duration-500">
         {/* Seek slider */}
         <div
-          class="group/slider flex flex-1 cursor-pointer items-center p-2"
-          onMouseDown$={(e, t) => {
-            seeking.value = true;
-            videoRef.value?.pause();
-
-            const bounding = t.firstElementChild!.getBoundingClientRect();
-            const percent = (e.clientX - bounding.x) / bounding.width;
-            const fixed = Math.max(Math.min(percent, 1), 0);
-            seekTime.value = fixed * state.duration;
+          class="relative my-2 h-1 w-full"
+          style={{
+            "--current-value": `${playingPercent.value}%`,
+            "--buffer-value": `${bufferedPercent.value}%`,
           }}
-          onMouseUp$={finishSeeking}
-          window:onMouseMove$={(e, t) => {
-            if (seeking.value) {
-              const bounding = t.firstElementChild!.getBoundingClientRect();
-              const percent = (e.clientX - bounding.x) / bounding.width;
-              const fixed = Math.max(Math.min(percent, 1), 0);
-              seekTime.value = fixed * state.duration;
-            }
-          }}
-          window:onMouseUp$={finishSeeking}
         >
-          <div
-            class="relative h-[2px] w-full overflow-visible bg-white/40 transition-all after:absolute after:left-[var(--slide-value)] after:top-1/2 after:h-2 after:w-2 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:bg-white after:transition-[opacity] group-hover/slider:h-2 group-hover/slider:after:opacity-0"
-            style={{
-              "--slide-value": playingPercent.value + "%",
+          <div class="absolute left-0 top-0 h-1 w-full bg-white/40"></div>
+          <div class="absolute left-0 top-0 h-1 w-[var(--buffer-value)] bg-white/40"></div>
+          <div class="absolute left-0 top-0 h-1 w-[var(--current-value)] bg-red-500"></div>
+          <input
+            class="current-time-slider"
+            type="range"
+            min="0"
+            max={state.duration}
+            step="0.01"
+            value={state.currentTime}
+            onInput$={(_, elem) => {
+              seeking.value = true;
+              seekTime.value = elem.valueAsNumber;
+              if (videoRef.value) {
+                videoRef.value.pause();
+              }
             }}
-          >
-            <div
-              class="absolute left-0 top-0 h-full bg-white/40"
-              style={{
-                width: bufferedPercent.value + "%",
-              }}
-            />
-            <div
-              class="absolute left-0 top-0 h-full bg-red-500"
-              style={{
-                width: playingPercent.value + "%",
-              }}
-            />
-          </div>
+            onChange$={() => {
+              seeking.value = false;
+              state.currentTime = seekTime.value;
+              if (videoRef.value) {
+                videoRef.value.currentTime = seekTime.value;
+                videoRef.value.play();
+              }
+            }}
+          />
         </div>
 
-        {/* controller */}
+        {/* buttons */}
         <div
           class="flex justify-between"
           onMouseEnter$={() => (mouseBusy.value = true)}
@@ -311,6 +295,13 @@ export const Player = component$<Props>((props) => {
                 }
               }}
             />
+
+            <span class="p-2">
+              {formatTime2(
+                seeking.value ? seekTime.value : state.currentTime,
+                state.duration
+              )}
+            </span>
           </div>
 
           {/* right controls */}

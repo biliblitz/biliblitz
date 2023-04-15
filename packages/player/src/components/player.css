@@ -1,18 +1,31 @@
 .volume-slider {
-  appearance: none;
-
-  @apply h-1 w-32 cursor-pointer bg-white/60;
+  @apply h-1 w-24 cursor-pointer appearance-none bg-white/60;
 }
 
 .volume-slider-thumb {
-  appearance: none;
-
-  @apply h-3 w-3 rounded-full border-none bg-white outline-none;
+  @apply h-3 w-3 appearance-none rounded-full border-none bg-white outline-none;
 }
 
 .volume-slider::-webkit-slider-thumb {
   @apply volume-slider-thumb;
 }
+
 .volume-slider::-moz-range-thumb {
   @apply volume-slider-thumb;
+}
+
+.current-time-slider {
+  @apply absolute left-0 top-0 h-1 w-full cursor-pointer appearance-none bg-transparent;
+}
+
+.current-time-slider-thumb {
+  @apply h-3 w-3 appearance-none rounded-full border-none bg-red-500 outline-none;
+}
+
+.current-time-slider::-webkit-slider-thumb {
+  @apply current-time-slider-thumb;
+}
+
+.current-time-slider::-moz-range-thumb {
+  @apply current-time-slider-thumb;
 }
