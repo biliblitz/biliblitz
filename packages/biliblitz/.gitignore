@@ -3,6 +3,7 @@ dist
 lib
 lib-types
 server
+tmp
 
 # Private information
 /.env

@@ -1,0 +1,31 @@
+{
+  "name": "@biliblitz/cli",
+  "version": "0.0.1",
+  "main": "./dist/index.cjs",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "biliblitz": "./bin/biliblitz.js"
+  },
+  "scripts": {
+    "build": "esbuild --bundle src/index.ts --outdir=dist --platform=node --format=esm --external:yargs --external:zx --external:inquirer",
+    "execute": "node --loader esbuild-register/loader -r esbuild-register src/index.ts",
+    "transform": "yarn execute transform"
+  },
+  "dependencies": {
+    "inquirer": "^9.1.5",
+    "yargs": "^17.7.1",
+    "zx": "^7.2.1"
+  },
+  "devDependencies": {
+    "@biliblitz/player": "0.0.1",
+    "@types/inquirer": "^9.0.3",
+    "@types/yargs": "^17.0.24",
+    "esbuild": "^0.17.16",
+    "esbuild-register": "^3.4.2",
+    "typescript": "^5.0.4",
+    "vite": "^4.2.1",
+    "vite-tsconfig-paths": "^4.2.0"
+  }
+}
