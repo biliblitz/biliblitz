@@ -11,7 +11,11 @@ export default () => {
       </head>
       <body>
         <main class="mx-auto mt-8 max-w-4xl">
-          <Player video={{ mimetype: "video/mp4", source: "/PV.mp4" }} />
+          <Player
+            video={[
+              { mimetype: "video/mp4", source: "/PV.mp4", resolution: "360p" },
+            ]}
+          />
         </main>
       </body>
     </>

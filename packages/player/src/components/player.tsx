@@ -2,8 +2,9 @@ import {
   $,
   component$,
   useComputed$,
-  useContextProvider,
   useSignal,
+  useStore,
+  useStylesScoped$,
   useVisibleTask$,
 } from "@builder.io/qwik";
 import {
@@ -11,9 +12,6 @@ import {
   HiArrowsPointingOut,
   HiPause,
   HiPlay,
-} from "@qwikest/icons/heroicons";
-import {
-  IoContext,
   IoPlayForward,
   IoText,
   IoVolumeHigh,
@@ -21,21 +19,23 @@ import {
   IoVolumeMedium,
   IoVolumeMute,
   IoVolumeOff,
-} from "@qwikest/icons/ionicons";
+} from "@biliblitz/icons";
 import type { SubtitleSource, VideoSource } from "../types";
 
-import { Video } from "./video";
+import Ass from "./ass";
+
+import style from "./player.css?inline";
 
 type Props = {
-  video: VideoSource;
+  video: VideoSource[];
+  thumbnail?: string;
   subtitles?: SubtitleSource[];
 };
 
-export const Player = component$((props: Props) => {
-  const video = props.video;
-  const subtitles = props.subtitles ?? [];
+export const Player = component$<Props>((props) => {
+  useStylesScoped$(style);
 
-  useContextProvider(IoContext, { variant: "outline" });
+  const subtitles = props.subtitles ?? [];
 
   const videoRef = useSignal<HTMLVideoElement>();
   const playerRef = useSignal<HTMLDivElement>();
@@ -43,13 +43,15 @@ export const Player = component$((props: Props) => {
   const subtitle = useSignal<SubtitleSource>();
 
   // video state, sync with element
-  const playing = useSignal(false);
-  const muted = useSignal(false);
-  const volume = useSignal(1);
-  const playbackRate = useSignal(1);
-  const currentTime = useSignal(0);
-  const duration = useSignal(NaN);
-  const buffered = useSignal(0);
+  const state = useStore({
+    playing: false,
+    muted: false,
+    volume: 1,
+    playbackRate: 1,
+    currentTime: 0,
+    duration: NaN,
+    buffered: 0,
+  });
   // not sync with element
   const seeking = useSignal(false);
   const seekTime = useSignal(0);
@@ -58,13 +60,13 @@ export const Player = component$((props: Props) => {
   useVisibleTask$(({ track }) => {
     const video = track(() => videoRef.value);
     if (video) {
-      muted.value = video.muted;
-      volume.value = video.volume;
-      playing.value = !video.paused;
-      playbackRate.value = video.playbackRate;
-      currentTime.value = video.currentTime;
-      duration.value = video.duration;
-      buffered.value = 0;
+      state.playing = !video.paused;
+      state.muted = video.muted;
+      state.volume = video.volume;
+      state.playbackRate = video.playbackRate;
+      state.currentTime = video.currentTime;
+      state.duration = video.duration;
+      state.buffered = 0;
     }
   });
 
@@ -79,7 +81,7 @@ export const Player = component$((props: Props) => {
   });
 
   const togglePlay = $(() => {
-    if (playing.value) {
+    if (state.playing) {
       videoRef.value?.pause();
     } else {
       videoRef.value?.play();
@@ -87,7 +89,7 @@ export const Player = component$((props: Props) => {
   });
   const toggleMute = $(() => {
     if (videoRef.value) {
-      videoRef.value.muted = !muted.value;
+      videoRef.value.muted = !state.muted;
     }
   });
   const toggleFullscreen = $(() => {
@@ -98,9 +100,7 @@ export const Player = component$((props: Props) => {
     }
   });
 
-  const seekingVolume = useSignal(false);
-
-  const mouseMoves = useSignal(0);
+  const mouseMoving = useSignal<number>();
   const mouseBusy = useSignal(false);
 
   const updateProgress = $((video: HTMLVideoElement) => {
@@ -111,34 +111,33 @@ export const Player = component$((props: Props) => {
         buff = Math.max(buff, video.buffered.end(i));
       }
     }
-    if (buffered.value !== buff) {
-      buffered.value = buff;
-    }
+    state.buffered = buff;
   });
 
   const finishSeeking = $(() => {
     if (seeking.value) {
       seeking.value = false;
-      currentTime.value = seekTime.value;
       if (videoRef.value) {
+        state.currentTime = seekTime.value;
         videoRef.value.currentTime = seekTime.value;
         videoRef.value.play();
       }
     }
   });
 
-  const playingPercent = useComputed$(() => {
-    return isNaN(duration.value)
+  const playingPercent = useComputed$(() =>
+    isNaN(state.duration)
       ? 0
-      : ((seeking.value ? seekTime.value : currentTime.value) /
-          duration.value) *
-          100;
-  });
-  const bufferedPercent = useComputed$(() => {
-    return isNaN(duration.value) ? 0 : (buffered.value / duration.value) * 100;
-  });
-  const volumePercent = useComputed$(() =>
-    muted.value ? 0 : volume.value * 100
+      : ((seeking.value ? seekTime.value : state.currentTime) /
+          state.duration) *
+        100
+  );
+  const bufferedPercent = useComputed$(() =>
+    isNaN(state.duration) ? 0 : (state.buffered / state.duration) * 100
+  );
+  const volumePercent = useComputed$(() => (state.muted ? 0 : state.volume));
+  const playerInactive = useComputed$(
+    () => mouseMoving.value === undefined && !mouseBusy.value
   );
 
   return (
@@ -146,122 +145,81 @@ export const Player = component$((props: Props) => {
       class={[
         "group relative aspect-video",
         {
-          playing: playing.value,
-          inactive: mouseMoves.value === 0 && !mouseBusy.value,
+          playing: state.playing,
+          inactive: playerInactive.value && false,
         },
       ]}
       ref={playerRef}
       onMouseMove$={() => {
-        mouseMoves.value++;
-        setTimeout(() => mouseMoves.value--, 2000);
+        if (mouseMoving.value) {
+          clearTimeout(mouseMoving.value);
+        }
+        mouseMoving.value = setTimeout(() => {
+          mouseMoving.value = undefined;
+        }, 2000);
       }}
     >
-      <Video
-        video={video}
-        subtitle={subtitle.value}
-        ref={videoRef}
-        onClick$={togglePlay}
-        onPlay$={() => (playing.value = true)}
-        onPause$={() => (playing.value = false)}
-        onVolumeChange$={(_, video) => {
-          volume.value = video.volume;
-          muted.value = video.muted;
-        }}
-        onRateChange$={(_, video) => {
-          playbackRate.value = video.playbackRate;
-        }}
-        onDurationChange$={(_, video) => {
-          duration.value = video.duration;
-        }}
-        onTimeUpdate$={(_, video) => {
-          currentTime.value = video.currentTime;
-          updateProgress(video);
-        }}
-        onProgress$={(_, video) => updateProgress(video)}
-        onKeyDown$={(event: KeyboardEvent, video) => {
-          if (event.code === "ArrowLeft") {
-            video.currentTime -= 5;
-          } else if (event.code === "ArrowRight") {
-            video.currentTime += 5;
-          } else if (event.code === "ArrowUp") {
-            video.volume = Math.min(video.volume + 0.1, 1);
-          } else if (event.code === "ArrowDown") {
-            video.volume = Math.max(video.volume - 0.1, 0);
-          } else if (event.code === "Space") {
-            video.paused ? video.play() : video.pause();
+      {/* center video element */}
+      <div class="relative h-full w-full bg-black">
+        <video
+          class="h-full w-full object-contain"
+          ref={videoRef}
+          onClick$={(_, video) => (video.paused ? video.play() : video.pause())}
+          onPlay$={() => (state.playing = true)}
+          onPause$={() => (state.playing = false)}
+          onVolumeChange$={(_, video) => {
+            state.volume = video.volume;
+            state.muted = video.muted;
+          }}
+          onRateChange$={(_, video) =>
+            (state.playbackRate = video.playbackRate)
           }
-        }}
-        preventdefault:keydown
-      />
-
-      {/* controller */}
-      <div
-        class="absolute bottom-0 left-0 flex w-full gap-2 bg-gradient-to-t from-black/20 to-transparent p-2 text-white transition-[opacity] group-[.inactive]:opacity-0"
-        onMouseEnter$={() => (mouseBusy.value = true)}
-        onMouseLeave$={() => (mouseBusy.value = false)}
-      >
-        {/* left */}
-        <div class="inline-flex gap-2">
-          {/* play/pause button */}
-          <span onClick$={togglePlay} class="cursor-pointer p-2">
-            {playing.value ? (
-              <HiPause class="h-6 w-6 drop-shadow" />
-            ) : (
-              <HiPlay class="h-6 w-6 drop-shadow" />
-            )}
-          </span>
-
-          {/* Volume slider */}
-          <span onClick$={toggleMute} class="cursor-pointer p-2">
-            {muted.value ? (
-              <IoVolumeMute class="h-6 w-6 drop-shadow" />
-            ) : volume.value < 0.2 ? (
-              <IoVolumeOff class="h-6 w-6 drop-shadow" />
-            ) : volume.value < 0.5 ? (
-              <IoVolumeLow class="h-6 w-6 drop-shadow" />
-            ) : volume.value < 0.7 ? (
-              <IoVolumeMedium class="h-6 w-6 drop-shadow" />
-            ) : (
-              <IoVolumeHigh class="h-6 w-6 drop-shadow" />
-            )}
-          </span>
-
-          {/* volume */}
-          <span
-            class="-ml-2 flex w-0 cursor-pointer items-center overflow-hidden py-2 opacity-0 duration-500 hover:w-20 hover:px-2 hover:opacity-100 [:hover+&]:w-20 [:hover+&]:px-2 [:hover+&]:opacity-100"
-            onMouseDown$={(e, t) => {
-              seekingVolume.value = true;
-              const bounding = t.firstElementChild!.getBoundingClientRect();
-              const percent = (e.clientX - bounding.x) / bounding.width;
-              const fixed = Math.max(Math.min(percent, 1), 0);
-              if (videoRef.value) {
-                videoRef.value.volume = fixed;
-                videoRef.value.muted = false;
-              }
-            }}
-            onMouseUp$={() => (seekingVolume.value = false)}
-            window:onMouseUp$={() => (seekingVolume.value = false)}
-            window:onMouseMove$={(e, t) => {
-              if (seekingVolume.value) {
-                const bounding = t.firstElementChild!.getBoundingClientRect();
-                const percent = (e.clientX - bounding.x) / bounding.width;
-                const fixed = Math.max(Math.min(percent, 1), 0);
-                if (videoRef.value) {
-                  videoRef.value.volume = fixed;
-                }
-              }
-            }}
-          >
-            <div
-              class="relative h-[2px] w-full overflow-visible bg-white after:absolute after:left-[var(--slide-value)] after:top-1/2 after:h-2 after:w-2 after:-translate-y-1/2 after:-translate-x-1/2 after:rounded-full after:bg-white"
-              style={{ "--slide-value": volumePercent.value + "%" }}
+          onDurationChange$={(_, video) => (state.duration = video.duration)}
+          onTimeUpdate$={(_, video) => {
+            state.currentTime = video.currentTime;
+            updateProgress(video);
+          }}
+          onProgress$={(_, video) => updateProgress(video)}
+          preventdefault:keydown
+          onKeyDown$={(event, video) => {
+            if (event.key === "ArrowLeft") {
+              video.currentTime -= 5;
+            } else if (event.key === "ArrowRight") {
+              video.currentTime += 5;
+            } else if (event.key === "ArrowUp") {
+              video.volume = Math.min(video.volume + 0.1, 1);
+            } else if (event.key === "ArrowDown") {
+              video.volume = Math.max(video.volume - 0.1, 0);
+            } else if (event.key === "Space") {
+              video.paused ? video.play() : video.pause();
+            }
+          }}
+        >
+          {props.video.map((video, index) => (
+            <source key={index} src={video.source} type={video.mimetype} />
+          ))}
+          {(subtitle.value?.type === "webvtt" ||
+            subtitle.value?.type === "srt") && (
+            <track
+              src={subtitle.value.source}
+              srcLang={subtitle.value.language}
+              kind="subtitles"
+              default
             />
-          </span>
+          )}
+        </video>
+        {/* libass-wasm */}
+        <Ass subtitle={subtitle.value} videoRef={videoRef} />
+        {/* center pause button */}
+        <div class="pointer-events-none absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-slate-300 opacity-60 transition group-[.playing]:scale-125 group-[.playing]:opacity-0 dark:bg-slate-800">
+          <HiPlay class="h-8 w-8 text-white" />
         </div>
+      </div>
 
+      <div class="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/20 to-transparent p-2 text-white transition-[opacity] group-[.inactive]:opacity-0">
         {/* Seek slider */}
         <div
-          class="group/slider mx-2 flex flex-1 cursor-pointer items-center p-2"
+          class="group/slider flex flex-1 cursor-pointer items-center p-2"
           onMouseDown$={(e, t) => {
             seeking.value = true;
             videoRef.value?.pause();
@@ -269,7 +227,7 @@ export const Player = component$((props: Props) => {
             const bounding = t.firstElementChild!.getBoundingClientRect();
             const percent = (e.clientX - bounding.x) / bounding.width;
             const fixed = Math.max(Math.min(percent, 1), 0);
-            seekTime.value = fixed * duration.value;
+            seekTime.value = fixed * state.duration;
           }}
           onMouseUp$={finishSeeking}
           window:onMouseMove$={(e, t) => {
@@ -277,25 +235,25 @@ export const Player = component$((props: Props) => {
               const bounding = t.firstElementChild!.getBoundingClientRect();
               const percent = (e.clientX - bounding.x) / bounding.width;
               const fixed = Math.max(Math.min(percent, 1), 0);
-              seekTime.value = fixed * duration.value;
+              seekTime.value = fixed * state.duration;
             }
           }}
           window:onMouseUp$={finishSeeking}
         >
           <div
-            class="relative h-[2px] w-full overflow-visible bg-white/40 transition-all after:absolute after:left-[var(--slide-value)] after:top-1/2 after:h-2 after:w-2 after:-translate-y-1/2 after:-translate-x-1/2 after:rounded-full after:bg-white after:transition-[opacity] group-hover/slider:h-2 group-hover/slider:after:opacity-0"
+            class="relative h-[2px] w-full overflow-visible bg-white/40 transition-all after:absolute after:left-[var(--slide-value)] after:top-1/2 after:h-2 after:w-2 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:bg-white after:transition-[opacity] group-hover/slider:h-2 group-hover/slider:after:opacity-0"
             style={{
               "--slide-value": playingPercent.value + "%",
             }}
           >
             <div
-              class="absolute top-0 left-0 h-full bg-white/40"
+              class="absolute left-0 top-0 h-full bg-white/40"
               style={{
                 width: bufferedPercent.value + "%",
               }}
             />
             <div
-              class="absolute top-0 left-0 h-full bg-red-500"
+              class="absolute left-0 top-0 h-full bg-red-500"
               style={{
                 width: playingPercent.value + "%",
               }}
@@ -303,58 +261,111 @@ export const Player = component$((props: Props) => {
           </div>
         </div>
 
-        {/* right controls */}
-        <div class="inline-flex gap-2">
-          {/* playback rate select button */}
-          <span class="cursor-pointer p-2">
-            <IoPlayForward class="h-6 w-6 drop-shadow" />
-            <div class="hidden">
-              <menu class="menu">
-                <h3 class="menu-title">Speed</h3>
-                {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => {
-                  return (
-                    <li
-                      class={[
-                        "menu-radio",
-                        { checked: playbackRate.value === rate },
-                      ]}
-                      onClick$={() => {
-                        if (videoRef.value) {
-                          videoRef.value.playbackRate = rate;
-                        }
-                      }}
-                      key={rate}
-                    >
-                      {rate}
-                    </li>
-                  );
-                })}
-              </menu>
-            </div>
-          </span>
-          {/* Subtitle select button */}
-          <span
-            class="cursor-pointer p-2"
-            onClick$={() => {
-              if (!subtitle.value) {
-                subtitle.value = subtitles[0];
-              } else {
-                const index = subtitles.indexOf(subtitle.value);
-                if (index + 1 === subtitles.length) {
-                  subtitle.value = undefined;
-                } else {
-                  subtitle.value = subtitles[index + 1];
+        {/* controller */}
+        <div
+          class="flex justify-between"
+          onMouseEnter$={() => (mouseBusy.value = true)}
+          onMouseLeave$={() => (mouseBusy.value = false)}
+        >
+          {/* left */}
+          <div class="inline-flex items-center gap-2">
+            {/* play/pause button */}
+            <span onClick$={togglePlay} class="cursor-pointer p-2">
+              {state.playing ? (
+                <HiPause class="h-6 w-6 drop-shadow" />
+              ) : (
+                <HiPlay class="h-6 w-6 drop-shadow" />
+              )}
+            </span>
+
+            {/* volume icon */}
+            <span onClick$={toggleMute} class="cursor-pointer p-2">
+              {state.muted ? (
+                <IoVolumeMute class="h-6 w-6 drop-shadow" />
+              ) : state.volume < 0.2 ? (
+                <IoVolumeOff class="h-6 w-6 drop-shadow" />
+              ) : state.volume < 0.5 ? (
+                <IoVolumeLow class="h-6 w-6 drop-shadow" />
+              ) : state.volume < 0.7 ? (
+                <IoVolumeMedium class="h-6 w-6 drop-shadow" />
+              ) : (
+                <IoVolumeHigh class="h-6 w-6 drop-shadow" />
+              )}
+            </span>
+
+            {/* volume slider */}
+            <input
+              type="range"
+              class="volume-slider"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volumePercent.value}
+              onInput$={(_, elem) => {
+                if (videoRef.value) {
+                  state.volume = elem.valueAsNumber;
+                  state.muted = false;
+                  videoRef.value.volume = elem.valueAsNumber;
+                  videoRef.value.muted = false;
+                  console.log(elem.valueAsNumber);
                 }
-              }
-            }}
-          >
-            <IoText class="h-6 w-6 drop-shadow" />
-          </span>
-          {/* fullscreen change button */}
-          <span onClick$={toggleFullscreen} class="cursor-pointer p-2">
-            <HiArrowsPointingOut class="h-6 w-6 drop-shadow group-[:fullscreen]:hidden" />
-            <HiArrowsPointingIn class="h-6 w-6 drop-shadow group-[:not(:fullscreen)]:hidden" />
-          </span>
+              }}
+            />
+          </div>
+
+          {/* right controls */}
+          <div class="inline-flex gap-2">
+            {/* playback rate select button */}
+            <span class="cursor-pointer p-2">
+              <IoPlayForward class="h-6 w-6 drop-shadow" />
+              <div class="hidden">
+                <menu class="menu">
+                  <h3 class="menu-title">Speed</h3>
+                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => {
+                    return (
+                      <li
+                        class={[
+                          "menu-radio",
+                          { checked: state.playbackRate === rate },
+                        ]}
+                        onClick$={() => {
+                          if (videoRef.value) {
+                            videoRef.value.playbackRate = rate;
+                          }
+                        }}
+                        key={rate}
+                      >
+                        {rate}
+                      </li>
+                    );
+                  })}
+                </menu>
+              </div>
+            </span>
+            {/* Subtitle select button */}
+            <span
+              class="cursor-pointer p-2"
+              onClick$={() => {
+                if (!subtitle.value) {
+                  subtitle.value = subtitles[0];
+                } else {
+                  const index = subtitles.indexOf(subtitle.value);
+                  if (index + 1 === subtitles.length) {
+                    subtitle.value = undefined;
+                  } else {
+                    subtitle.value = subtitles[index + 1];
+                  }
+                }
+              }}
+            >
+              <IoText class="h-6 w-6 drop-shadow" />
+            </span>
+            {/* fullscreen change button */}
+            <span onClick$={toggleFullscreen} class="cursor-pointer p-2">
+              <HiArrowsPointingOut class="h-6 w-6 drop-shadow group-[:fullscreen]:hidden" />
+              <HiArrowsPointingIn class="h-6 w-6 drop-shadow group-[:not(:fullscreen)]:hidden" />
+            </span>
+          </div>
         </div>
       </div>
     </div>

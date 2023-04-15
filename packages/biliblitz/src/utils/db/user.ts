@@ -15,7 +15,7 @@ collUser.createIndexes([
   },
 ]);
 
-export function userLogin(username: string, password: string) {
+export function userLoginByUsername(username: string, password: string) {
   return collUser.findOne({ username, password });
 }
 

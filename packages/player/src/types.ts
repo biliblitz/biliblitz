@@ -1,7 +1,7 @@
 export type VideoSource = {
   mimetype: string;
   source: string;
-  thumbnail?: string;
+  resolution: string;
 };
 
 export type SubtitleSource = {

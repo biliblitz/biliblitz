@@ -7,6 +7,7 @@ export type Episode = {
   uploadAt: Date;
   unlockAt: Date;
   source: VideoSource;
+  thumbnail?: string;
   subtitles: SubtitleSource[];
 };
 
