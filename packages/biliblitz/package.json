@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@biliblitz/player": "^0.0.1",
+    "@biliblitz/icons": "^0.0.1",
     "mongodb": "^5.0.1"
   },
   "devDependencies": {

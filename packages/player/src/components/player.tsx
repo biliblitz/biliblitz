@@ -104,17 +104,6 @@ export const Player = component$<Props>((props) => {
   const mouseMoving = useSignal<number>();
   const mouseBusy = useSignal(false);
 
-  const updateProgress = $((video: HTMLVideoElement) => {
-    const n = video.buffered.length;
-    let buff = 0;
-    for (let i = 0; i < n; ++i) {
-      if (video.buffered.start(i) <= video.currentTime) {
-        buff = Math.max(buff, video.buffered.end(i));
-      }
-    }
-    state.buffered = buff;
-  });
-
   const playingPercent = useComputed$(() =>
     isNaN(state.duration)
       ? 0
@@ -129,6 +118,105 @@ export const Player = component$<Props>((props) => {
   const playerInactive = useComputed$(
     () => mouseMoving.value === undefined && !mouseBusy.value
   );
+
+  // videoRef events
+  useVisibleTask$(({ track, cleanup }) => {
+    const video = track(() => videoRef.value);
+
+    if (video) {
+      const onClick = () => (video.paused ? video.play() : video.pause());
+      const onPlay = () => (state.playing = true);
+      const onPause = () => (state.playing = false);
+      const onVolumeChange = () => {
+        state.volume = video.volume;
+        state.muted = video.muted;
+      };
+      const onRateChange = () => (state.playbackRate = video.playbackRate);
+      const onDurationChange = () => (state.duration = video.duration);
+      const onProgress = () => {
+        const n = video.buffered.length;
+        let buff = 0;
+        for (let i = 0; i < n; ++i) {
+          if (video.buffered.start(i) <= video.currentTime) {
+            buff = Math.max(buff, video.buffered.end(i));
+          }
+        }
+        state.buffered = buff;
+      };
+      const onTimeUpdate = () => {
+        state.currentTime = video.currentTime;
+        onProgress();
+      };
+      const onKeyDown = (event: KeyboardEvent) => {
+        event.preventDefault();
+        if (event.key === "ArrowLeft") {
+          video.currentTime -= 5;
+        } else if (event.key === "ArrowRight") {
+          video.currentTime += 5;
+        } else if (event.key === "ArrowUp") {
+          video.volume = Math.min(video.volume + 0.1, 1);
+        } else if (event.key === "ArrowDown") {
+          video.volume = Math.max(video.volume - 0.1, 0);
+        } else if (event.key === " ") {
+          onClick();
+        }
+      };
+
+      video.addEventListener("click", onClick);
+      video.addEventListener("play", onPlay);
+      video.addEventListener("pause", onPause);
+      video.addEventListener("volumechange", onVolumeChange);
+      video.addEventListener("ratechange", onRateChange);
+      video.addEventListener("durationchange", onDurationChange);
+      video.addEventListener("progress", onProgress);
+      video.addEventListener("timeupdate", onTimeUpdate);
+      video.addEventListener("keydown", onKeyDown);
+
+      cleanup(() => {
+        video.removeEventListener("click", onClick);
+        video.removeEventListener("play", onPlay);
+        video.removeEventListener("pause", onPause);
+        video.removeEventListener("volumechange", onVolumeChange);
+        video.removeEventListener("ratechange", onRateChange);
+        video.removeEventListener("durationchange", onDurationChange);
+        video.removeEventListener("progress", onProgress);
+        video.removeEventListener("timeupdate", onTimeUpdate);
+        video.removeEventListener("keydown", onKeyDown);
+      });
+    }
+  });
+
+  // input events
+  const seekRangeRef = useSignal<HTMLInputElement>();
+  useVisibleTask$(({ track, cleanup }) => {
+    const input = track(() => seekRangeRef.value);
+
+    if (input) {
+      const onInput = () => {
+        seeking.value = true;
+        seekTime.value = input.valueAsNumber;
+        if (videoRef.value) {
+          videoRef.value.pause();
+        }
+      };
+      const onChange = () => {
+        seeking.value = false;
+        state.currentTime = seekTime.value;
+        if (videoRef.value) {
+          videoRef.value.currentTime = seekTime.value;
+          videoRef.value.play();
+        }
+      };
+
+      input.addEventListener("input", onInput);
+      input.addEventListener("change", onChange);
+
+      cleanup(() => {
+        input.removeEventListener("input", onInput);
+        input.removeEventListener("change", onChange);
+      });
+    }
+  });
 
   return (
     <div
@@ -151,41 +239,7 @@ export const Player = component$<Props>((props) => {
     >
       {/* center video element */}
       <div class="relative h-full w-full bg-black">
-        <video
-          class="h-full w-full object-contain"
-          ref={videoRef}
-          onClick$={(_, video) => (video.paused ? video.play() : video.pause())}
-          onPlay$={() => (state.playing = true)}
-          onPause$={() => (state.playing = false)}
-          onVolumeChange$={(_, video) => {
-            state.volume = video.volume;
-            state.muted = video.muted;
-          }}
-          onRateChange$={(_, video) =>
-            (state.playbackRate = video.playbackRate)
-          }
-          onDurationChange$={(_, video) => (state.duration = video.duration)}
-          onTimeUpdate$={(_, video) => {
-            state.currentTime = video.currentTime;
-            updateProgress(video);
-          }}
-          onProgress$={(_, video) => updateProgress(video)}
-          preventdefault:keydown
-          onKeyDown$={(event, video) => {
-            console.log(event.key);
-            if (event.key === "ArrowLeft") {
-              video.currentTime -= 5;
-            } else if (event.key === "ArrowRight") {
-              video.currentTime += 5;
-            } else if (event.key === "ArrowUp") {
-              video.volume = Math.min(video.volume + 0.1, 1);
-            } else if (event.key === "ArrowDown") {
-              video.volume = Math.max(video.volume - 0.1, 0);
-            } else if (event.key === " ") {
-              video.paused ? video.play() : video.pause();
-            }
-          }}
-        >
+        <video class="h-full w-full object-contain" ref={videoRef}>
           {props.video.map((video, index) => (
             <source key={index} src={video.source} type={video.mimetype} />
           ))}
@@ -226,22 +280,8 @@ export const Player = component$<Props>((props) => {
             min="0"
             max={state.duration}
             step="0.01"
-            value={state.currentTime}
-            onInput$={(_, elem) => {
-              seeking.value = true;
-              seekTime.value = elem.valueAsNumber;
-              if (videoRef.value) {
-                videoRef.value.pause();
-              }
-            }}
-            onChange$={() => {
-              seeking.value = false;
-              state.currentTime = seekTime.value;
-              if (videoRef.value) {
-                videoRef.value.currentTime = seekTime.value;
-                videoRef.value.play();
-              }
-            }}
+            value={seeking.value ? seekTime.value : state.currentTime}
+            ref={seekRangeRef}
           />
         </div>
 

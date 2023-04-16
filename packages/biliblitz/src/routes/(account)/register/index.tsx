@@ -1,24 +1,17 @@
 import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { routeAction$, Form, Link, z, zod$ } from "@builder.io/qwik-city";
-import { MongoServerError } from "mongodb";
 import { userRegister } from "~/utils/db/user";
 
 export const useRegister = routeAction$(
   async (data, { fail, redirect }) => {
     try {
-      const result = await userRegister(data.username, data.password);
+      const user = await userRegister(data.username, data.password);
 
-      if (!result.acknowledged) {
-        return fail(403, { reason: "Permission Denied" });
-      }
-
-      throw redirect(302, `/u/${result.insertedId.toHexString()}`);
+      redirect(302, `/u/${user._id}`);
     } catch (e) {
-      if (e instanceof MongoServerError && e.code === 11000) {
-        return fail(403, { reason: "Username is Taken" });
-      } else {
-        throw e;
+      if (e instanceof Error) {
+        fail(400, { message: e.message });
       }
     }
   },

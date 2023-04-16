@@ -6,7 +6,7 @@ export type Episode = {
   name: string;
   uploadAt: Date;
   unlockAt: Date;
-  source: VideoSource;
+  source: VideoSource[];
   thumbnail?: string;
   subtitles: SubtitleSource[];
 };
@@ -35,12 +35,7 @@ export function createVideo(uploader: ObjectId, title: string) {
   });
 }
 
-export function createEpisode(
-  videoId: ObjectId,
-  name: string,
-  source: VideoSource,
-  subtitles: SubtitleSource[]
-) {
+export function createEpisode(videoId: ObjectId, name: string) {
   return collVideo.updateOne(
     { _id: videoId },
     {
@@ -49,8 +44,8 @@ export function createEpisode(
           name,
           uploadAt: new Date(),
           unlockAt: new Date(),
-          source,
-          subtitles,
+          source: [],
+          subtitles: [],
         },
       },
     }

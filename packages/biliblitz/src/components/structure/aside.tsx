@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
-import { HiComputerDesktop, HiVideoCamera } from "@qwikest/icons/heroicons";
+import { HiComputerDesktop, HiVideoCamera } from "@biliblitz/icons";
 import { NavLink } from "~/components/nav-link/nav-link";
 
 export const Aside = component$(() => {
