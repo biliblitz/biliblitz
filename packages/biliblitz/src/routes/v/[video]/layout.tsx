@@ -3,27 +3,21 @@ import type { RequestHandler } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { ObjectId } from "mongodb";
 import { NavLink } from "~/components/nav-link/nav-link";
-import { getPublicVideoById } from "~/utils/db/video";
-import { serializeObject } from "~/utils/serialize";
+import { assertObjectId } from "~/utils/assert";
+import { getPublicVideoById, serializeVideo } from "~/utils/db/video";
+import { loader } from "~/utils/qwik";
 
-export const onRequest: RequestHandler = ({ params, error }) => {
-  const video = params.video;
-
-  if (!ObjectId.isValid(video)) {
-    throw error(404, "Unexpected param");
-  }
+export const onRequest: RequestHandler = ({ params }) => {
+  assertObjectId(params.video);
 };
 
-export const useVideo = routeLoader$(async ({ params, error }) => {
-  const id = new ObjectId(params.video);
-  const video = await getPublicVideoById(id);
-
-  if (!video) {
-    throw error(404, "Video not found");
-  }
-
-  return serializeObject(video);
-});
+export const useVideo = routeLoader$(
+  loader(async ({ params }) => {
+    const id = new ObjectId(params.video);
+    const video = await getPublicVideoById(id);
+    return serializeVideo(video);
+  })
+);
 
 export default component$(() => {
   const video = useVideo();
@@ -33,7 +27,11 @@ export default component$(() => {
       <main class="flex-1">
         <Slot />
         <h1 class="my-4 text-2xl font-bold">{video.value.title}</h1>
-        <p class="text-sm">{video.value.description}</p>
+        <p class="text-sm">
+          {video.value.description || (
+            <span class="italic opacity-60">No description</span>
+          )}
+        </p>
       </main>
       <aside class="w-64 shrink-0">
         <nav class="nav px-0">
@@ -46,7 +44,7 @@ export default component$(() => {
               href={`/v/${video.value._id}/${index}/`}
             >
               <span class="overflow-hidden text-ellipsis">
-                #{index + 1} {episode.name}
+                ep{index + 1}. {episode.name}
               </span>
             </NavLink>
           ))}

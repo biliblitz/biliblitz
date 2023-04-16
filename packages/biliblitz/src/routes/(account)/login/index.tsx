@@ -3,9 +3,10 @@ import type { DocumentHead } from "@builder.io/qwik-city";
 import { routeAction$, Form, Link, z, zod$ } from "@builder.io/qwik-city";
 import { issueSession } from "~/utils/db/session";
 import { userLoginByUsername } from "~/utils/db/user";
+import { ActionRedirect, action } from "~/utils/qwik";
 
 export const useLogin = routeAction$(
-  async (data, { cookie, redirect }) => {
+  action(async (data, { cookie }) => {
     const user = await userLoginByUsername(data.username, data.password);
 
     if (!user) {
@@ -19,8 +20,8 @@ export const useLogin = routeAction$(
       path: "/",
     });
 
-    throw redirect(302, `/u/${user._id.toHexString()}`);
-  },
+    throw new ActionRedirect(302, `/u/${user._id.toHexString()}`);
+  }),
   zod$({
     username: z.string().min(1),
     password: z.string().min(1),

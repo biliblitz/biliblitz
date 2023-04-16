@@ -3,17 +3,17 @@ import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { HiPlus } from "@biliblitz/icons";
 import { checkSession } from "~/utils/db/session";
 import { getVideoByUser } from "~/utils/db/video";
-import { serializeObject } from "~/utils/serialize";
+import { loader } from "~/utils/qwik";
+import { assertAuthorized } from "~/utils/assert";
 
-export const useUserVideos = routeLoader$(async ({ cookie, redirect }) => {
-  const user = await checkSession(cookie);
-  if (!user) {
-    throw redirect(302, "/login");
-  }
+export const useUserVideos = routeLoader$(
+  loader(async ({ cookie }) => {
+    const user = await checkSession(cookie);
+    assertAuthorized(user);
 
-  const videos = await getVideoByUser(user._id);
-  return videos.map(serializeObject);
-});
+    return await getVideoByUser(user._id);
+  })
+);
 
 export default component$(() => {
   const userVideos = useUserVideos();
@@ -35,7 +35,7 @@ export default component$(() => {
       <div class="mt-4 space-y-4">
         {userVideos.value.map((video) => (
           <Link
-            class="flex gap-4 rounded-xl transition hover:underline"
+            class="flex gap-4 hover:underline"
             href={`/upload/video/${video._id}`}
             key={video._id}
           >

@@ -3,21 +3,21 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 import { ObjectId } from "mongodb";
 import { Player } from "@biliblitz/player";
 import { getPublicVideoById } from "~/utils/db/video";
+import { assertFound } from "~/utils/assert";
+import { loader } from "~/utils/qwik";
 
-import { serializeObject } from "~/utils/serialize";
+export const useEpisode = routeLoader$(
+  loader(async ({ params }) => {
+    const id = new ObjectId(params.video);
+    const video = await getPublicVideoById(id);
 
-export const useEpisode = routeLoader$(async ({ params, error }) => {
-  const id = new ObjectId(params.video);
-  const video = (await getPublicVideoById(id))!;
+    const index = Math.abs(parseInt(params.episode));
+    const episode = video.episodes.at(index) ?? null;
+    assertFound(episode);
 
-  const index = Math.abs(parseInt(params.episode));
-  const episode = video.episodes.at(index);
-  if (!episode) {
-    throw error(404, "Episode not found");
-  }
-
-  return serializeObject(episode);
-});
+    return episode;
+  })
+);
 
 export default component$(() => {
   const episode = useEpisode();

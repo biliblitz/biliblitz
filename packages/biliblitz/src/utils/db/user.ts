@@ -1,5 +1,6 @@
-import { MongoServerError, ObjectId, WithId } from "mongodb";
+import type { ObjectId, WithId } from "mongodb";
 import { db } from "../db";
+import { assertAcknowledged, assertNotNull, assertNull } from "../assert";
 
 export interface User {
   username: string;
@@ -15,42 +16,46 @@ collUser.createIndexes([
   },
 ]);
 
-export function userLoginByUsername(username: string, password: string) {
-  return collUser.findOne({ username, password });
+/**
+ * Login by username
+ *
+ * @param username username
+ * @param password password
+ * @returns Found user or null
+ */
+export async function userLoginByUsername(username: string, password: string) {
+  return await collUser.findOne({ username, password });
 }
 
-export function userLoginByEmail(email: string, password: string) {
-  return collUser.findOne({ email, password });
+/**
+ * Login by email
+ *
+ * @param email email
+ * @param password password
+ * @returns Found user or null
+ */
+export async function userLoginByEmail(email: string, password: string) {
+  return await collUser.findOne({ email, password });
 }
 
 /**
  * Register user
  *
  * @param username username
- * @param password password
+ * @param password password not hashed
  * @returns Created user
- * @throws {Error} if faced any problem
  */
 export async function userRegister(username: string, password: string) {
-  try {
-    const result = await collUser.insertOne({ username, password });
+  const olduser = await collUser.findOne({ username });
+  assertNull(olduser, "Username was already taken");
 
-    if (!result.acknowledged) {
-      throw new Error("Database Error");
-    }
+  const result = await collUser.insertOne({ username, password });
+  assertAcknowledged(result);
 
-    const user = await getUserById(result.insertedId);
-    if (!user) {
-      throw new Error("unreachable");
-    }
+  const user = await collUser.findOne({ _id: result.insertedId });
+  assertNotNull(user, "Should find inserted user", 500);
 
-    return serializeUser(user);
-  } catch (e) {
-    if (e instanceof MongoServerError && e.code === 11000) {
-      throw new Error("Username was taken");
-    }
-    throw e;
-  }
+  return user;
 }
 
 export async function getUserById(userId: ObjectId) {

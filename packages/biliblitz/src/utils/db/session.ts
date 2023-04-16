@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import type { ObjectId } from "mongodb";
 import { db } from "../db";
 import { getUserById } from "./user";
+import { assertAcknowledged } from "../assert";
 
 export interface Session {
   user: ObjectId;
@@ -26,10 +27,7 @@ export async function issueSession(user: ObjectId) {
     session: uuid,
     createdAt: new Date(),
   });
-
-  if (!result.acknowledged) {
-    throw new Error("Failed to write on DB");
-  }
+  assertAcknowledged(result);
 
   return uuid;
 }

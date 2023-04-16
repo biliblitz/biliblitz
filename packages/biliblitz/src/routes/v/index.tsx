@@ -1,13 +1,15 @@
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { Heading } from "~/components/heading/heading";
-import { getPublicVideoRandom } from "~/utils/db/video";
-import { serializeObject } from "~/utils/serialize";
+import { getPublicVideoRandom, serializeVideo } from "~/utils/db/video";
+import { loader } from "~/utils/qwik";
 
-export const useVideos = routeLoader$(async () => {
-  const videos = await getPublicVideoRandom();
-  return videos.map(serializeObject);
-});
+export const useVideos = routeLoader$(
+  loader(async () => {
+    const videos = await getPublicVideoRandom();
+    return videos.map(serializeVideo);
+  })
+);
 
 export default component$(() => {
   const videos = useVideos();
@@ -34,13 +36,7 @@ export default component$(() => {
             >
               <span>Alice</span>
               <span>-</span>
-              <span>
-                {video.unlockAt
-                  .toLocaleDateString("zh-CN-u-ca-chinese", {
-                    dateStyle: "full",
-                  })
-                  .slice(4, -3)}
-              </span>
+              <span>{video.unlockAt.toLocaleDateString()}</span>
             </Link>
           </div>
         ))}
