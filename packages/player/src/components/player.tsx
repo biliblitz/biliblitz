@@ -4,7 +4,7 @@ import {
   useComputed$,
   useSignal,
   useStore,
-  useStylesScoped$,
+  useStyles$,
   useVisibleTask$,
 } from "@builder.io/qwik";
 import {
@@ -34,7 +34,7 @@ type Props = {
 };
 
 export const Player = component$<Props>((props) => {
-  useStylesScoped$(style);
+  useStyles$(style);
 
   const subtitles = props.subtitles ?? [];
 
@@ -275,7 +275,7 @@ export const Player = component$<Props>((props) => {
           <div class="absolute left-0 top-0 h-1 w-[var(--buffer-value)] bg-white/40"></div>
           <div class="absolute left-0 top-0 h-1 w-[var(--current-value)] bg-red-500"></div>
           <input
-            class="current-time-slider"
+            class="player-current-time-slider"
             type="range"
             min="0"
             max={state.duration}
@@ -320,7 +320,7 @@ export const Player = component$<Props>((props) => {
             {/* volume slider */}
             <input
               type="range"
-              class="volume-slider"
+              class="player-volume-slider"
               min="0"
               max="1"
               step="0.01"
