@@ -34,7 +34,7 @@
     "publish": "npm publish"
   },
   "devDependencies": {
-    "@biliblitz/libass-wasm": "^0.0.1",
+    "@biliblitz/libass-wasm": "^0.0.3",
     "@biliblitz/icons": "^0.0.1",
     "@builder.io/qwik": "^0.102.0",
     "@types/eslint": "^8.37.0",
