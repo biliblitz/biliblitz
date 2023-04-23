@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@biliblitz/libass-wasm@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@biliblitz/libass-wasm/-/libass-wasm-0.0.3.tgz#be75b874d27f477bfa57a9ac59985b1bcca56d3c"
+  integrity sha512-oa4ol0XNShiP978Z7NGIi0c2PILDxFuoHvmaBxLOufCK1a86OAgH8Ckz2jnNE+Zv29bMBwPaUsc1Eoe0bb50iw==
+
 "@builder.io/qwik-city@^0.102.0":
   version "0.102.0"
   resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-0.102.0.tgz#99ac3523281ed23ebc19127bf46bfa0e893278d7"
