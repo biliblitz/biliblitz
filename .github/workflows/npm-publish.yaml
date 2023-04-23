@@ -15,6 +15,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - run: |
+          git submodule sync
+          git submodule update --init --recursive --force
       - run: yarn install
       - run: yarn lint
       - run: yarn build
@@ -29,6 +32,9 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+      - run: |
+          git submodule sync
+          git submodule update --init --recursive --force
       - run: yarn install
       - run: yarn build
       - run: yarn publish
