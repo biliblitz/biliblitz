@@ -347,9 +347,9 @@ export const Player = component$<Props>((props) => {
           {/* right controls */}
           <div class="inline-flex gap-2">
             {/* playback rate select button */}
-            <span class="cursor-pointer p-2">
+            <span class="menu-btn relative cursor-pointer p-2">
               <IoPlayForward class="h-6 w-6 drop-shadow" />
-              <div class="hidden">
+              <div class="menu-box">
                 <menu class="menu">
                   <h3 class="menu-title">Speed</h3>
                   {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => {
