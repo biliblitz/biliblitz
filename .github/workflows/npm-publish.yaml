@@ -19,8 +19,8 @@ jobs:
           git submodule sync
           git submodule update --init --recursive --force
       - run: yarn install
-      - run: yarn lint
       - run: yarn build
+      - run: yarn lint
 
   publish-npm:
     needs: build
