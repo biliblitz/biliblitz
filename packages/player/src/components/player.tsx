@@ -351,7 +351,6 @@ export const Player = component$<Props>((props) => {
               <IoPlayForward class="h-6 w-6 drop-shadow" />
               <div class="menu-box">
                 <menu class="menu">
-                  <h3 class="menu-title">Speed</h3>
                   {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => {
                     return (
                       <li
@@ -366,7 +365,7 @@ export const Player = component$<Props>((props) => {
                         }}
                         key={rate}
                       >
-                        {rate}
+                        x{rate}
                       </li>
                     );
                   })}

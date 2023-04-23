@@ -35,11 +35,11 @@
 }
 
 .menu-btn:hover > .menu-box {
-  @apply absolute -left-3 bottom-10 block;
+  @apply absolute -left-4 bottom-10 block;
 }
 
 .menu {
-  @apply rounded-md bg-black bg-opacity-80 px-2;
+  @apply rounded-md bg-black bg-opacity-80;
 }
 
 .menu-title {
@@ -47,9 +47,17 @@
 }
 
 .menu-radio {
-  @apply w-10 text-sm font-medium text-white hover:text-cyan-400;
+  @apply px-4 py-1 text-center text-sm font-medium text-white hover:text-cyan-400;
+}
+
+.menu-radio:first-child {
+  @apply rounded-t-md;
+}
+
+.menu-radio:last-child {
+  @apply rounded-b-md;
 }
 
 .menu-radio.checked {
-  @apply text-cyan-400;
+  @apply bg-white bg-opacity-10 text-cyan-400;
 }
