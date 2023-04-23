@@ -1,6 +1,6 @@
 [submodule "packages/icons/heroicons"]
 	path = packages/icons/heroicons
-	url = git@github.com:tailwindlabs/heroicons
+	url = https://github.com/tailwindlabs/heroicons.git
 [submodule "packages/icons/ionicons"]
 	path = packages/icons/ionicons
-	url = git@github.com:ionic-team/ionicons
+	url = https://github.com/ionic-team/ionicons.git
