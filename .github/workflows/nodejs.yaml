@@ -22,5 +22,5 @@ jobs:
           git submodule update --init --recursive --force
       - run: yarn install
       - run: yarn fmt --check
-      - run: yarn lint
       - run: yarn build
+      - run: yarn lint
