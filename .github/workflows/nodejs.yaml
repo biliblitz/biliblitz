@@ -17,6 +17,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - run: |
+          git submodule sync
+          git submodule update --init --recursive --force
       - run: yarn install
       - run: yarn fmt --check
       - run: yarn lint
