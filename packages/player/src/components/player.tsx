@@ -347,15 +347,15 @@ export const Player = component$<Props>((props) => {
           {/* right controls */}
           <div class="inline-flex gap-2">
             {/* playback rate select button */}
-            <span class="menu-btn relative cursor-pointer p-2">
+            <span class="player-menu-btn cursor-pointer p-2">
               <IoPlayForward class="h-6 w-6 drop-shadow" />
-              <div class="menu-box">
-                <menu class="menu">
+              <div class="player-menu-box -left-7 bottom-10">
+                <menu class="player-menu">
                   {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => {
                     return (
                       <li
                         class={[
-                          "menu-radio",
+                          "player-menu-radio",
                           { checked: state.playbackRate === rate },
                         ]}
                         onClick$={() => {
@@ -365,7 +365,7 @@ export const Player = component$<Props>((props) => {
                         }}
                         key={rate}
                       >
-                        x{rate}
+                        {rate}
                       </li>
                     );
                   })}
@@ -373,22 +373,35 @@ export const Player = component$<Props>((props) => {
               </div>
             </span>
             {/* Subtitle select button */}
-            <span
-              class="cursor-pointer p-2"
-              onClick$={() => {
-                if (!subtitle.value) {
-                  subtitle.value = subtitles[0];
-                } else {
-                  const index = subtitles.indexOf(subtitle.value);
-                  if (index + 1 === subtitles.length) {
-                    subtitle.value = undefined;
-                  } else {
-                    subtitle.value = subtitles[index + 1];
-                  }
-                }
-              }}
-            >
+            <span class="player-menu-btn cursor-pointer p-2">
               <IoText class="h-6 w-6 drop-shadow" />
+              <div class="player-menu-box bottom-10 right-0">
+                <menu class="player-menu w-fit">
+                  <li class="player-menu-radio whitespace-nowrap hover:text-white">
+                    字幕
+                  </li>
+                  {subtitles.length === 0 ? (
+                    <li class="player-menu-radio checked">无</li>
+                  ) : (
+                    subtitles.map((s) => {
+                      return (
+                        <li
+                          class={[
+                            "player-menu-radio whitespace-nowrap",
+                            { checked: subtitle.value === s },
+                          ]}
+                          onClick$={() => {
+                            subtitle.value = s;
+                          }}
+                          key={s.title}
+                        >
+                          {s.title}
+                        </li>
+                      );
+                    })
+                  )}
+                </menu>
+              </div>
             </span>
             {/* fullscreen change button */}
             <span onClick$={toggleFullscreen} class="cursor-pointer p-2">

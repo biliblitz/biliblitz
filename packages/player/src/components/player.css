@@ -30,34 +30,34 @@
   @apply player-current-time-slider-thumb;
 }
 
-.menu-box {
+.player-menu-btn {
+  @apply relative;
+}
+
+.player-menu-box {
   @apply hidden;
 }
 
-.menu-btn:hover > .menu-box {
-  @apply absolute -left-4 bottom-10 block;
+.player-menu-btn:hover > .player-menu-box {
+  @apply absolute block;
 }
 
-.menu {
-  @apply rounded-md bg-black bg-opacity-80;
+.player-menu {
+  @apply mb-4 rounded-md bg-black bg-opacity-60;
 }
 
-.menu-title {
-  @apply text-sm font-medium text-white;
+.player-menu-radio {
+  @apply px-8 py-2 text-center text-sm font-medium text-white transition-colors hover:text-cyan-400;
 }
 
-.menu-radio {
-  @apply px-4 py-1 text-center text-sm font-medium text-white hover:text-cyan-400;
-}
-
-.menu-radio:first-child {
+.player-menu-radio:first-child {
   @apply rounded-t-md;
 }
 
-.menu-radio:last-child {
+.player-menu-radio:last-child {
   @apply rounded-b-md;
 }
 
-.menu-radio.checked {
+.player-menu-radio.checked {
   @apply bg-white bg-opacity-10 text-cyan-400;
 }
